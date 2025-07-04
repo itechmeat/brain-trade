@@ -1,0 +1,42 @@
+.authContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.userInfo {
+  font-size: 13px;
+  color: var(--gray-11);
+  font-weight: 500;
+  font-family: monospace;
+}
+
+.logoutButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--gray-6);
+  border-radius: 6px;
+  background: var(--gray-2);
+  color: var(--gray-11);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--gray-3);
+    border-color: var(--gray-7);
+    color: var(--gray-12);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}

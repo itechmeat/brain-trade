@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { Theme } from '@radix-ui/themes';
+import { PrivyProvider } from '@/providers/PrivyProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
 import './globals.css';
 import '@radix-ui/themes/styles.css';
@@ -17,7 +18,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'BrainTrade - Tokenized Expert Consultations',
-  description: 'Personal consultations with AI experts on any topic. Select an expert and start a chat.',
+  description:
+    'Personal consultations with AI experts on any topic. Select an expert and start a chat.',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -51,11 +53,13 @@ export default function RootLayout({
       </head>
 
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <QueryProvider>
-          <Theme accentColor="blue" grayColor="gray" radius="medium">
-            {children}
-          </Theme>
-        </QueryProvider>
+        <PrivyProvider>
+          <QueryProvider>
+            <Theme accentColor="blue" grayColor="gray" radius="medium">
+              {children}
+            </Theme>
+          </QueryProvider>
+        </PrivyProvider>
       </body>
     </html>
   );
