@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3300",
-    "dev:turbo": "next dev --turbopack --port 3300",
+    "dev": "next dev --port 3200",
+    "dev:turbo": "next dev --turbopack --port 3200",
     "build": "next build",
     "start": "next start --port ${PORT:-8080}",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:blockchain": "node scripts/test-connection.js"
   },
   "dependencies": {
     "@langchain/community": "^0.3.47",
@@ -25,6 +26,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^16.6.0",
     "eslint-config-prettier": "^10.1.5",
+    "ethers": "^6.15.0",
     "langchain": "^0.3.29",
     "next": "15.3.4",
     "openai": "^4.104.0",
@@ -43,6 +45,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
+    "hardhat": "^3.0.0-next.20",
     "typescript": "^5"
   }
 }
