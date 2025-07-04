@@ -1,24 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BrainTrade - Decentralized AI Expert Marketplace
+
+A decentralized marketplace for AI experts with token-gated knowledge on Zircuit blockchain.
+
+## Tech Stack
+
+- **Frontend**: Next.js 15 + TypeScript + SCSS
+- **Blockchain**: Zircuit L2 + Hardhat
+- **Authentication**: Privy Embedded Wallets
+- **AI**: OpenAI/Gemini via OpenRouter
+- **Vector DB**: Qdrant for RAG system
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install Dependencies
+
+```bash
+npm install
+```
+
+### 2. Environment Setup
+
+Copy `.env.example` to `.env` and fill in your keys:
+
+```bash
+# Required for blockchain development
+ZIRCUIT_RPC_URL=https://zircuit-garfield-testnet.drpc.org
+ZIRCUIT_PRIVATE_KEY=your_private_key_here
+
+# Required for AI features
+OPENAI_API_KEY=your_openai_key
+GEMINI_API_KEY=your_gemini_key
+OPENROUTER_API_KEY=your_openrouter_key
+
+# Required for authentication
+NEXT_PUBLIC_PRIVY_CLIENT_ID=your_privy_client_id
+NEXT_PUBLIC_PRIVY_APP_ID=your_privy_app_id
+```
+
+### 3. Test Blockchain Connection
+
+Test your Zircuit testnet connection:
+
+```bash
+node scripts/test-connection.js
+```
+
+Expected output:
+
+```
+🔗 Testing Zircuit testnet connection...
+✅ Network connected: { name: 'unknown', chainId: '48898', hex: '0xbf02' }
+👛 Wallet info: { address: '0x...', balance: '0.05 ETH' }
+📦 Latest block: 5657181
+🎉 Zircuit testnet connection successful!
+```
+
+### 4. Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3200](http://localhost:3200) with your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Blockchain Development
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Get Testnet Tokens
+
+1. Add Zircuit testnet to MetaMask:
+   - **Network Name**: Zircuit Garfield Testnet
+   - **RPC URL**: https://zircuit-garfield-testnet.drpc.org
+   - **Chain ID**: 48898 (0xbf02)
+   - **Currency**: ETH
+
+2. Get test tokens from Zircuit faucet
+
+### Export Private Key
+
+1. MetaMask → Account Details → Show Private Key
+2. Add to `.env` as `ZIRCUIT_PRIVATE_KEY`
+3. **⚠️ Use separate wallet for development**
+
+### Test Connection
+
+```bash
+# Test blockchain connection
+node scripts/test-connection.js
+
+# Check Hardhat config
+npx hardhat --help
+```
 
 ## Learn More
 
