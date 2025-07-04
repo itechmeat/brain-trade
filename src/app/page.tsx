@@ -1,159 +1,45 @@
 'use client';
 
-import React, { useState } from 'react';
-import { IdeaInput } from '@/components/idea';
-import { ChatInterface } from '@/components/chat';
-import { DocumentViewer, DocumentModal } from '@/components/document';
-import { BottomNavigation } from '@/components/navigation/BottomNavigation/BottomNavigation';
-import { ExpertsPanel } from '@/components/experts';
-import { useChat } from '@/hooks/useChat';
+import React from 'react';
+import { useRouter } from 'next/navigation';
+import { ExpertSelectionGrid } from '@/components/experts';
+import investmentExperts from '@/data/investment_experts.json';
+import type { InvestmentExpert } from '@/types/expert';
 import styles from './page.module.scss';
 
 export default function Home() {
-  const [isExpertsPanelOpen, setIsExpertsPanelOpen] = useState(false);
+  const router = useRouter();
+  const experts = investmentExperts as InvestmentExpert[];
 
-  const {
-    currentSession,
-    isLoading,
-    error,
-    currentSpeakers,
-    startNewChat,
-    sendMessage,
-    endSession,
-    handleReaction,
-    handleApplyRecommendations,
-    stopQueue,
-    resumeQueue,
-    isQueueStopped,
-    isApplyingRecommendations,
-    experts,
-    // Document modal state
-    isDocumentModalOpen,
-    hasUnreadDocumentChanges,
-    openDocumentModal,
-    closeDocumentModal,
-  } = useChat();
-
-  const handleIdeaSubmit = async (idea: string) => {
-    try {
-      await startNewChat(idea);
-    } catch (err) {
-      console.error('Error starting chat:', err);
-    }
+  const handleExpertSelect = (expertSlug: string) => {
+    // Create a new chat session ID
+    const chatId = `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Navigate to expert chat
+    router.push(`/chat/${expertSlug}/${chatId}`);
   };
 
-  const handleSendMessage = async (content: string) => {
-    try {
-      await sendMessage(content);
-    } catch (err) {
-      console.error('Error sending message:', err);
-    }
-  };
-
-  const handleEndSession = () => {
-    endSession();
-  };
-
-  const handleToggleSession = () => {
-    if (isQueueStopped) {
-      resumeQueue();
-    } else {
-      stopQueue();
-    }
-  };
-
-  const handleShowExperts = () => {
-    setIsExpertsPanelOpen(true);
-  };
-
-  const handleCloseExperts = () => {
-    setIsExpertsPanelOpen(false);
-  };
-
-  // If there's an active session, show mobile-first layout
-  if (currentSession) {
-    return (
-      <>
-        {/* Mobile Layout */}
-        <div className={styles.mobileLayout}>
-          <div className={styles.chatContainer}>
-            <ChatInterface
-              session={currentSession}
-              experts={experts}
-              onSendMessage={handleSendMessage}
-              onEndSession={handleEndSession}
-              onReaction={handleReaction}
-              onApplyRecommendations={handleApplyRecommendations}
-              onStopQueue={stopQueue}
-              onResumeQueue={resumeQueue}
-              isLoading={isLoading}
-              isApplyingRecommendations={isApplyingRecommendations}
-              currentSpeakers={currentSpeakers}
-              isQueueStopped={isQueueStopped}
-              className={styles.mobileChat}
-            />
-          </div>
-
-          {/* Bottom Navigation */}
-          <BottomNavigation
-            onShowDocument={openDocumentModal}
-            onToggleSession={handleToggleSession}
-            onShowExperts={handleShowExperts}
-            hasUnreadDocument={hasUnreadDocumentChanges}
-            isSessionStopped={isQueueStopped}
-          />
-        </div>
-
-        {/* Desktop Layout (preserved for larger screens) */}
-        <div className={styles.desktopLayout}>
-          <div className={styles.chatPanel}>
-            <ChatInterface
-              session={currentSession}
-              experts={experts}
-              onSendMessage={handleSendMessage}
-              onEndSession={handleEndSession}
-              onReaction={handleReaction}
-              onApplyRecommendations={handleApplyRecommendations}
-              onStopQueue={stopQueue}
-              onResumeQueue={resumeQueue}
-              isLoading={isLoading}
-              currentSpeakers={currentSpeakers}
-              isQueueStopped={isQueueStopped}
-            />
-          </div>
-          <div className={styles.documentPanel}>
-            <DocumentViewer
-              document={currentSession.projectDocument || 'No document available'}
-              title="Project Document"
-            />
-          </div>
-        </div>
-
-        {/* Document Modal */}
-        <DocumentModal
-          isOpen={isDocumentModalOpen}
-          onClose={closeDocumentModal}
-          document={currentSession.projectDocument || 'No document available'}
-          title="Project Document"
-          hasUnreadChanges={hasUnreadDocumentChanges}
-        />
-
-        {/* Experts Panel */}
-        <ExpertsPanel
-          isOpen={isExpertsPanelOpen}
-          onClose={handleCloseExperts}
-          experts={experts}
-          activeExperts={currentSession.experts}
-        />
-      </>
-    );
-  }
-
-  // Otherwise show idea input form
   return (
     <div className={styles.container}>
-      <IdeaInput onSubmit={handleIdeaSubmit} disabled={isLoading} />
-      {error && <div className={styles.errorToast}>{error}</div>}
+      <header className={styles.header}>
+        <div className={styles.headerContent}>
+          <h1 className={styles.title}>BrainTrade</h1>
+          <p className={styles.subtitle}>
+            Tokenized Expert Consultations
+          </p>
+          <p className={styles.description}>
+            Select an expert and start a personal consultation on any topic
+          </p>
+        </div>
+      </header>
+      
+      <main className={styles.main}>
+        <ExpertSelectionGrid
+          experts={experts}
+          onExpertSelect={handleExpertSelect}
+          className={styles.expertGrid}
+        />
+      </main>
     </div>
   );
 }

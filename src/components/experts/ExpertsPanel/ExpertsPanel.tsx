@@ -60,7 +60,6 @@ export function ExpertsPanel({
   if (!isOpen) return null;
 
   const activeExpertsList = experts.filter(expert => activeExperts.includes(expert.slug));
-  const assistantExpert = experts.find(expert => expert.slug === 'assistant');
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -81,25 +80,6 @@ export function ExpertsPanel({
 
         {/* Content */}
         <div className={styles.content}>
-          {/* Assistant Section */}
-          {assistantExpert && (
-            <div className={styles.assistantSection}>
-              <h4 className={styles.sectionTitle}>AI Assistant</h4>
-              <div className={styles.expertsList}>
-                <div className={styles.expertItem}>
-                  <ExpertAvatar expert={assistantExpert} size="md" showName={false} />
-                  <div className={styles.expertInfo}>
-                    <h5 className={styles.expertName}>
-                      {assistantExpert.name} ({assistantExpert.slug})
-                    </h5>
-                    <p className={styles.expertRole}>{assistantExpert.fund}</p>
-                    <p className={styles.expertDescription}>{assistantExpert.expertise}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Active Experts Section */}
           <div className={styles.activeSection}>
             <h4 className={styles.sectionTitle}>Investment Experts ({activeExpertsList.length})</h4>

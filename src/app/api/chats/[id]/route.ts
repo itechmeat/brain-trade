@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 
 import { createAPIHandlerWithParams } from '@/lib/api/base-handler';
+import { APIError } from '@/lib/api/middleware/auth';
 import { getChatSession, updateChatSession } from '@/lib/chat-utils';
 
 /**
@@ -11,7 +12,8 @@ export const GET = createAPIHandlerWithParams(async (request: NextRequest, param
   
   const session = getChatSession(sessionId);
   if (!session) {
-    throw new Error('Chat session not found');
+    // Use APIError for proper 404 handling
+    throw new APIError('Chat session not found', 404);
   }
 
   return session;

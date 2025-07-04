@@ -7,6 +7,10 @@ export interface InvestmentExpert {
   slug: string;
   collection?: string;
   fund: string;
+  token?: string;
+  tokenPrice?: number;
+  costPerQuery?: number;
+  description?: string;
   methodology: string;
   expertise: string;
   focus: string;
@@ -15,10 +19,10 @@ export interface InvestmentExpert {
   website?: string;
   twitter?: string;
   isRagExpert?: boolean;
-  isAssistant?: boolean;
   ragConfig?: {
     topK: number;
     scoreThreshold: number;
     maxContextLength: number;
   };
+  systemPrompt?: string; // Custom prompt for each expert
 }

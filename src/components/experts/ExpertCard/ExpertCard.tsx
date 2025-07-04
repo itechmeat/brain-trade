@@ -1,13 +1,14 @@
 import React from 'react';
 import { InvestmentExpert } from '@/types';
 import { Card } from '@/components/ui/Card/Card';
+import { Button } from '@/components/ui/Button/Button';
 import { ExpertAvatar } from '../ExpertAvatar/ExpertAvatar';
 import styles from './ExpertCard.module.scss';
 
 interface ExpertCardProps {
   expert: InvestmentExpert;
   className?: string;
-  variant?: 'compact' | 'detailed';
+  variant?: 'compact' | 'detailed' | 'selection';
   selected?: boolean;
   onClick?: () => void;
 }
@@ -23,22 +24,51 @@ export function ExpertCard({
     .filter(Boolean)
     .join(' ');
 
+  const handleCardClick = () => {
+    if (onClick) {
+      onClick();
+    }
+  };
+
   return (
     <Card
       className={cardClasses}
       variant="outlined"
       padding="md"
-      onClick={onClick}
-      hover={!!onClick}
+      onClick={variant === 'selection' ? undefined : handleCardClick}
+      hover={!!onClick && variant !== 'selection'}
     >
       <div className={styles.header}>
         <ExpertAvatar expert={expert} size={variant === 'compact' ? 'md' : 'lg'} showName={false} />
         <div className={styles.basicInfo}>
           <h3 className={styles.name}>{expert.name.replace(' (RAG)', '')}</h3>
+          {expert.token && (
+            <div className={styles.tokenInfo}>
+              <span className={styles.token}>${expert.token}</span>
+              {expert.costPerQuery && (
+                <span className={styles.cost}>${expert.costPerQuery.toFixed(4)}/query</span>
+              )}
+            </div>
+          )}
           <p className={styles.fund}>{expert.fund}</p>
-          {expert.price && <div className={styles.price}>${expert.price}/query</div>}
+          {expert.description && variant !== 'compact' && (
+            <p className={styles.description}>{expert.description}</p>
+          )}
         </div>
       </div>
+
+      {variant === 'selection' && (
+        <div className={styles.selectionActions}>
+          <Button
+            onClick={handleCardClick}
+            variant="primary"
+            size="lg"
+            className={styles.startChatButton}
+          >
+            Start Chat
+          </Button>
+        </div>
+      )}
 
       {variant === 'detailed' && (
         <div className={styles.details}>

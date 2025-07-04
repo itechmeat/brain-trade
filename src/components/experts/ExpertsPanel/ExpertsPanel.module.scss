@@ -63,24 +63,6 @@
   overscroll-behavior: none;
 }
 
-.assistantSection {
-  margin-bottom: var(--spacing-xl);
-  padding-bottom: var(--spacing-xl);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.assistantAvatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent-color), #8b5cf6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--spacing-xl);
-  box-shadow: var(--shadow-sm);
-}
-
 .activeSection {
   margin-bottom: 32px;
 }
@@ -137,7 +119,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--spacing-md);
-  
+
   @media (min-width: 375px) {
     grid-template-columns: 1fr 1fr;
   }
