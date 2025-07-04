@@ -6,8 +6,18 @@
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
   }
   
-  &:hover:not(.selected) {
+  &:hover:not(.selected):not(.selection) {
     border-color: #9ca3af;
+  }
+  
+  &.selection {
+    border: 2px solid var(--border-color);
+    transition: all 0.2s ease-in-out;
+    
+    &:hover {
+      border-color: var(--accent-color);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
   }
 }
 
@@ -30,11 +40,42 @@
     line-height: 1.3;
   }
   
+  .tokenInfo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
+    
+    .token {
+      font-size: var(--font-size-md);
+      font-weight: 700;
+      color: var(--accent-color);
+      background: rgba(59, 130, 246, 0.1);
+      padding: 2px 8px;
+      border-radius: var(--border-radius-sm);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+    
+    .cost {
+      font-size: var(--font-size-sm);
+      color: var(--success-color);
+      font-weight: 600;
+    }
+  }
+  
   .fund {
     font-size: var(--font-size-base);
     color: var(--text-secondary);
-    margin: 0 0 var(--spacing-sm) 0;
+    margin: 0 0 var(--spacing-xs) 0;
     line-height: 1.4;
+  }
+  
+  .description {
+    font-size: var(--font-size-md);
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.4;
+    font-style: italic;
   }
   
   .price {
@@ -111,7 +152,43 @@
   }
 }
 
+.selectionActions {
+  margin-top: var(--spacing-lg);
+  
+  .startChatButton {
+    width: 100%;
+    min-height: 48px; // Mobile-first touch target
+    font-weight: 600;
+    border-radius: var(--border-radius-md);
+    
+    // Mobile touch optimization
+    touch-action: manipulation;
+    user-select: none;
+    
+    @media (max-width: 768px) {
+      min-height: 52px; // Larger touch target on mobile
+      font-size: var(--font-size-lg);
+    }
+  }
+}
+
+.selection {
+  .header {
+    margin-bottom: var(--spacing-md);
+    
+    @media (max-width: 768px) {
+      margin-bottom: var(--spacing-sm);
+    }
+  }
+}
+
 @media (max-width: 768px) {
+  .expertCard {
+    &.selection {
+      border-width: 2px;
+    }
+  }
+  
   .header {
     gap: var(--spacing-md);
   }
@@ -121,8 +198,26 @@
       font-size: var(--font-size-lg);
     }
     
+    .tokenInfo {
+      flex-wrap: wrap;
+      gap: var(--spacing-xs);
+      
+      .token {
+        font-size: var(--font-size-sm);
+        padding: 3px 8px;
+      }
+      
+      .cost {
+        font-size: var(--font-size-xs);
+      }
+    }
+    
     .fund {
       font-size: var(--font-size-md);
+    }
+    
+    .description {
+      font-size: var(--font-size-sm);
     }
   }
   

@@ -4,15 +4,11 @@ import { nanoid } from 'nanoid';
 import { createAPIHandlerWithParams } from '@/lib/api/base-handler';
 import { ValidationSchemas } from '@/lib/validations';
 import { getChatSession, updateChatSession } from '@/lib/chat-utils';
-import { generateExpertChatResponse, generateDocumentUpdate } from '@/lib/api/ai-utils';
-import {
-  getExpertChatPrompt,
-  getUserMessageHandlerPrompt,
-  formatChatHistoryForPrompt,
-} from '@/lib/prompts';
+import { generateExpertChatResponse } from '@/lib/api/ai-utils';
+import { getExpertChatPrompt } from '@/lib/prompts';
 import investmentExperts from '@/data/investment_experts.json';
 
-import { ChatMessage, ChatSession } from '@/types/chat';
+import { ChatMessage } from '@/types/chat';
 import { ExpertChatResponse } from '@/types/ai';
 import { AvailableModel } from '@/types/ai';
 import type { InvestmentExpert } from '@/types/expert';
@@ -98,8 +94,7 @@ function getExpertBySlug(expertSlug: string): InvestmentExpert {
 /**
  * Generates expert response using AI
  * @param expert - Expert data
- * @param originalIdea - Original business idea
- * @param projectDocument - Project document
+ * @param originalIdea - Original topic/idea
  * @param chatHistory - Chat history
  * @param selectedModel - AI model to use
  * @returns Expert chat response
@@ -107,7 +102,6 @@ function getExpertBySlug(expertSlug: string): InvestmentExpert {
 async function generateExpertResponse(
   expert: InvestmentExpert,
   originalIdea: string,
-  projectDocument: string,
   chatHistory: string,
   selectedModel?: AvailableModel,
   language?: string,
@@ -122,7 +116,6 @@ async function generateExpertResponse(
     // 1. Get RAG context for this expert
     const projectData = {
       originalIdea,
-      projectDocument,
       chatHistory,
       expertName: expert.name,
       expertFund: expert.fund,
@@ -135,43 +128,65 @@ async function generateExpertResponse(
     const { ragAnalyzer } = await import('@/lib/rag');
     const ragResult = await ragAnalyzer.analyzeStartup(projectData, collectionName);
 
-    console.log('RAG Context retrieved:', {
+    console.log('✅ RAG Context retrieved:', {
       expertSlug: expert.slug,
+      collectionName,
       ragContextChunks: ragResult.context.length,
       ragTokens: ragResult.totalTokens,
       processingTime: ragResult.processingTime,
     });
 
+    // Log first few chunks for verification
+    if (ragResult.context.length > 0) {
+      console.log(
+        '📄 First RAG context chunk:',
+        ragResult.context[0].content.substring(0, 200) + '...',
+      );
+      console.log(
+        '🔢 RAG chunk scores:',
+        ragResult.context.slice(0, 3).map(c => c.score),
+      );
+      console.log(
+        '📚 RAG sources:',
+        ragResult.context.slice(0, 3).map(c => c.source),
+      );
+    }
+
     // 2. Create enhanced chat history with RAG context
     const ragContext = ragAnalyzer.createPromptContext(ragResult.context);
     const enhancedChatHistory = `${chatHistory}
 
-RAG CONTEXT FROM ${expert.name.toUpperCase()} KNOWLEDGE BASE:
-${ragContext}
+KNOWLEDGE BASE CONTEXT:
+${ragContext}`;
 
-Based on this context from your knowledge base, please provide your expert analysis.`;
+    // 3. Generate expert response using new prompt system (marketplace + expert system prompt)
+    const expertSystemPrompt =
+      expert.systemPrompt ||
+      `You are ${expert.name} from ${expert.fund}. Your expertise includes: ${expertiseList}. Your focus is: ${expert.focus}.`;
 
-    // 3. Generate expert response using standard prompt with RAG context and language requirements
-    const availableExperts = investmentExperts.map(e => ({
-      name: e.name,
-      slug: e.slug,
-      fund: e.fund,
-    }));
-
-    const prompt = getExpertChatPrompt({
-      expertName: expert.name,
-      expertFund: expert.fund,
-      expertMethodology: expert.methodology,
-      expertExpertise: expertiseList,
-      expertFocus: expert.focus,
+    const basePrompt = getExpertChatPrompt({
+      expertSystemPrompt: expertSystemPrompt,
       originalIdea: originalIdea,
-      projectDocument: projectDocument,
       chatHistory: enhancedChatHistory,
-      availableExperts: availableExperts,
       language: language,
     });
 
+    // Add final language enforcement at the very end
+    const prompt = `${basePrompt}
+
+🚨🚨🚨 FINAL CRITICAL REMINDER 🚨🚨🚨
+BEFORE YOU RESPOND: WHAT LANGUAGE DID THE USER WRITE IN?
+YOUR RESPONSE MUST BE IN THAT EXACT SAME LANGUAGE!
+🚨🚨🚨 RESPOND IN USER'S LANGUAGE 🚨🚨🚨`;
+
+    console.log('🤖 Sending enhanced prompt to LLM with RAG context...');
+    console.log('📝 Enhanced prompt length:', prompt.length);
+    console.log('🧠 Using model:', selectedModel || 'default');
+
     const result = await generateExpertChatResponse(prompt, selectedModel);
+
+    console.log('✅ LLM Response received with RAG enhancement');
+    console.log('💬 Response preview:', result.result.message.substring(0, 100) + '...');
 
     // Add RAG metadata to the result
     const enhancedResult = {
@@ -185,27 +200,19 @@ Based on this context from your knowledge base, please provide your expert analy
 
     return enhancedResult;
   } catch (error) {
-    console.error(`RAG analysis failed for expert ${expert.slug}:`, error);
+    console.error(`❌ RAG analysis failed for expert ${expert.slug}:`, error);
 
     // Fallback to standard expert generation without RAG
-    console.log('Falling back to standard expert generation...');
+    console.log('⚠️ Falling back to standard expert generation WITHOUT RAG...');
 
-    const availableExperts = investmentExperts.map(e => ({
-      name: e.name,
-      slug: e.slug,
-      fund: e.fund,
-    }));
+    const expertSystemPrompt =
+      expert.systemPrompt ||
+      `You are ${expert.name} from ${expert.fund}. Your expertise includes: ${expertiseList}. Your focus is: ${expert.focus}.`;
 
     const prompt = getExpertChatPrompt({
-      expertName: expert.name,
-      expertFund: expert.fund,
-      expertMethodology: expert.methodology,
-      expertExpertise: expertiseList,
-      expertFocus: expert.focus,
+      expertSystemPrompt: expertSystemPrompt,
       originalIdea: originalIdea,
-      projectDocument: projectDocument,
       chatHistory: chatHistory,
-      availableExperts: availableExperts,
       language: language,
     });
 
@@ -237,11 +244,8 @@ function createExpertMessage(
     type: 'expert',
     status: 'sent',
     metadata: {
-      confidence: response.confidence,
       processingTime,
-      nextSpeaker: response.nextSpeaker,
-      investmentInterest: response.investmentInterest,
-      recommendations: response.recommendations,
+      ...(response.ragMetadata && { ragMetadata: response.ragMetadata }),
     },
   };
 }
@@ -251,129 +255,46 @@ function createExpertMessage(
  * @param sessionId - Chat session ID
  * @param expert - Expert data
  * @param processingTime - Time taken
+ * @param sessionLanguage - Session language for localized fallback
  * @returns Fallback message
  */
 function createFallbackMessage(
   sessionId: string,
   expert: InvestmentExpert,
   processingTime: number,
+  sessionLanguage?: string,
 ): ChatMessage {
+  // Provide fallback messages in multiple languages
+  const fallbackMessages: Record<string, string> = {
+    Russian:
+      'У меня сейчас проблемы с анализом. Не могли бы вы перефразировать вопрос или предоставить больше деталей?',
+    English:
+      "I'm having trouble analyzing this right now. Could you please rephrase your question or provide more details?",
+    Spanish:
+      '¿Tengo problemas para analizar esto ahora mismo. ¿Podrías reformular tu pregunta o proporcionar más detalles?',
+    French:
+      "J'ai des difficultés à analyser cela en ce moment. Pourriez-vous reformuler votre question ou fournir plus de détails?",
+    German:
+      'Ich habe gerade Probleme bei der Analyse. Könnten Sie Ihre Frage umformulieren oder mehr Details angeben?',
+    Chinese: '我现在无法分析这个问题。您能重新表述一下问题或提供更多细节吗？',
+    Japanese: '現在分析に問題があります。質問を言い換えるか、詳細を教えていただけますか？',
+  };
+
+  const content = fallbackMessages[sessionLanguage || 'English'] || fallbackMessages.English;
+
   return {
     id: nanoid(12),
     chatId: sessionId,
     expertId: expert.slug,
-    content: `I'm having trouble analyzing this right now. Could you please rephrase your question or provide more details?`,
+    content,
     timestamp: new Date(),
     type: 'expert',
     status: 'sent',
     metadata: {
-      confidence: 0,
       reasoning: 'Fallback response due to AI error',
       processingTime,
     },
   };
-}
-
-/**
- * User message analysis response interface
- */
-interface UserMessageAnalysis {
-  assistantMessage: string;
-  actionType: 'expert_specific' | 'expert_all' | 'document_update' | 'general' | 'combined';
-  targetedExperts?: string[];
-  documentUpdateRequest?: string;
-  nextSpeakers: string[];
-  confidence: number;
-  reasoning: string;
-}
-
-/**
- * Analyzes user message and determines appropriate actions
- * @param session - Chat session data
- * @param userMessage - User's message
- * @param selectedModel - AI model to use
- * @returns Analysis result
- */
-async function analyzeUserMessage(
-  session: ChatSession,
-  userMessage: string,
-  selectedModel?: AvailableModel,
-): Promise<UserMessageAnalysis> {
-  const availableExperts = investmentExperts
-    .filter(e => session.experts.includes(e.slug))
-    .map(e => `${e.name} (@${e.slug}) - ${e.fund}`)
-    .join('\n');
-
-  const chatHistory = formatChatHistoryForPrompt(
-    session.messages.map(m => ({
-      type: m.type,
-      content: m.content,
-      expertId: m.expertId,
-      timestamp: m.timestamp,
-      userReaction: m.userReaction,
-    })),
-  );
-
-  const prompt = getUserMessageHandlerPrompt({
-    originalIdea: session.originalIdea,
-    projectDocument: session.projectDocument || 'No document created yet',
-    chatHistory,
-    userMessage,
-    availableExperts,
-  });
-
-  try {
-    const result = await generateExpertChatResponse(prompt, selectedModel);
-    return result.result as unknown as UserMessageAnalysis;
-  } catch (error) {
-    console.error('Failed to analyze user message:', error);
-    // Fallback to generic response
-    return {
-      assistantMessage: 'I understand your message. Let me have the experts respond.',
-      actionType: 'expert_all',
-      nextSpeakers: session.experts,
-      confidence: 50,
-      reasoning: 'Fallback response due to analysis error',
-    };
-  }
-}
-
-/**
- * Processes document update request
- * @param session - Chat session data
- * @param updateRequest - Description of what to update
- * @param selectedModel - AI model to use
- * @returns Updated document and assistant message
- */
-async function processDocumentUpdate(
-  session: ChatSession,
-  updateRequest: string,
-  selectedModel?: AvailableModel,
-): Promise<{ updatedDocument: string; assistantMessage: string }> {
-  try {
-    const result = await generateDocumentUpdate(
-      session.projectDocument || '',
-      updateRequest,
-      formatChatHistoryForPrompt(
-        session.messages.map(m => ({
-          type: m.type,
-          content: m.content,
-          expertId: m.expertId,
-          timestamp: m.timestamp,
-          userReaction: m.userReaction,
-        })),
-      ),
-      selectedModel,
-    );
-
-    return {
-      updatedDocument: result.updatedDocument,
-      assistantMessage: result.assistantMessage,
-    };
-  } catch (error) {
-    console.error('Failed to update document:', error);
-    throw new Error('Document update failed');
-  }
 }
 
 /**
@@ -391,141 +312,62 @@ export const POST = createAPIHandlerWithParams(async (request: NextRequest, para
   }
 
   if (type === 'user') {
-    // Step 1: Add user message to session
+    // Add user message to session
     const userMessage = createUserMessage(sessionId, content, type, expertId);
     addMessageToSession(sessionId, userMessage);
 
-    // Step 2: Analyze user message through assistant
-    console.log('Analyzing user message through assistant...');
-    const analysis = await analyzeUserMessage(session, content, selectedModel as AvailableModel);
+    // Generate expert response directly (1:1 chat with single expert)
+    const expert = getExpertBySlug(session.expertId);
+    const chatHistory = formatChatHistory(session.messages);
 
-    console.log('User message analysis result:', analysis);
+    console.log(`Generating expert response for: ${session.expertId}`);
 
-    const responseData: {
-      userMessage: ChatMessage;
-      assistantMessage: ChatMessage;
-      expertResponses?: ChatMessage[];
-      updatedDocument?: string;
-      nextSpeakers: string[];
-    } = {
-      userMessage,
-      assistantMessage: createUserMessage(
+    try {
+      const expertResponse = await generateExpertResponse(
+        expert,
+        session.originalIdea,
+        chatHistory,
+        selectedModel as AvailableModel,
+        session.language,
+      );
+
+      const expertMessage = createExpertMessage(sessionId, expert, expertResponse, Date.now());
+
+      // Add expert response to session
+      addMessageToSession(sessionId, expertMessage);
+
+      return {
+        userMessage,
+        expertMessage,
+      };
+    } catch (error) {
+      console.error(`Failed to generate response for expert ${session.expertId}:`, error);
+
+      const fallbackMessage = createFallbackMessage(
         sessionId,
-        analysis.assistantMessage,
-        'expert',
-        'assistant',
-      ),
-      nextSpeakers: analysis.nextSpeakers,
-    };
+        expert,
+        Date.now(),
+        session.language,
+      );
+      addMessageToSession(sessionId, fallbackMessage);
 
-    // Step 3: Add assistant message to session
-    addMessageToSession(sessionId, responseData.assistantMessage);
-
-    // Step 4: Handle different action types
-    switch (analysis.actionType) {
-      case 'expert_all':
-        console.log('Processing expert_all action - adding all experts to queue');
-        // Don't generate responses immediately, the queue system will handle this
-        break;
-
-      case 'expert_specific':
-        if (analysis.targetedExperts && analysis.targetedExperts.length > 0) {
-          console.log(
-            `Processing expert_specific action for: ${analysis.targetedExperts.join(', ')} - adding to queue`,
-          );
-          // Don't generate responses immediately, the queue system will handle this
-        }
-        break;
-
-      case 'document_update':
-        if (analysis.documentUpdateRequest) {
-          console.log('Processing document_update action');
-          const documentResult = await processDocumentUpdate(
-            session,
-            analysis.documentUpdateRequest,
-            selectedModel as AvailableModel,
-          );
-
-          responseData.updatedDocument = documentResult.updatedDocument;
-
-          // Update session with new document
-          updateChatSession(sessionId, {
-            projectDocument: documentResult.updatedDocument,
-            updatedAt: new Date(),
-          });
-
-          // Create document update message
-          const documentUpdateMessage = createUserMessage(
-            sessionId,
-            documentResult.assistantMessage,
-            'expert',
-            'assistant',
-          );
-          addMessageToSession(sessionId, documentUpdateMessage);
-        }
-        break;
-
-      case 'combined':
-        // Handle document update first, then experts
-        if (analysis.documentUpdateRequest) {
-          console.log('Processing combined action: document update');
-          const documentResult = await processDocumentUpdate(
-            session,
-            analysis.documentUpdateRequest,
-            selectedModel as AvailableModel,
-          );
-
-          responseData.updatedDocument = documentResult.updatedDocument;
-
-          // Update session with new document
-          updateChatSession(sessionId, {
-            projectDocument: documentResult.updatedDocument,
-            updatedAt: new Date(),
-          });
-
-          // Create document update message
-          const documentUpdateMessage = createUserMessage(
-            sessionId,
-            documentResult.assistantMessage,
-            'expert',
-            'assistant',
-          );
-          addMessageToSession(sessionId, documentUpdateMessage);
-        }
-
-        // Then handle experts - they will be handled by the queue system
-        if (analysis.targetedExperts && analysis.targetedExperts.length > 0) {
-          console.log(
-            `Processing combined action: experts ${analysis.targetedExperts.join(', ')} - adding to queue`,
-          );
-          // Don't generate responses immediately, the queue system will handle this
-        }
-        break;
-
-      case 'general':
-        console.log('Processing general action - no additional responses needed');
-        break;
-
-      default:
-        console.log('Unknown action type, no additional processing');
+      return {
+        userMessage,
+        expertMessage: fallbackMessage,
+      };
     }
-
-    return responseData;
   }
 
   if (type === 'expert' && expertId) {
     // Generate response for single expert (for queue processing)
     const expert = getExpertBySlug(expertId);
     const chatHistory = formatChatHistory(session.messages);
-    const projectDocument = session.projectDocument || 'No document created yet';
-
     console.log(`Generating single expert response for: ${expertId}`);
 
     try {
       const expertResponse = await generateExpertResponse(
         expert,
         session.originalIdea,
-        projectDocument,
         chatHistory,
         selectedModel as AvailableModel,
         session.language,
@@ -542,7 +384,12 @@ export const POST = createAPIHandlerWithParams(async (request: NextRequest, para
     } catch (error) {
       console.error(`Failed to generate response for expert ${expertId}:`, error);
 
-      const fallbackMessage = createFallbackMessage(sessionId, expert, Date.now());
+      const fallbackMessage = createFallbackMessage(
+        sessionId,
+        expert,
+        Date.now(),
+        session.language,
+      );
       addMessageToSession(sessionId, fallbackMessage);
 
       return {

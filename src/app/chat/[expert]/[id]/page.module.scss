@@ -1,0 +1,211 @@
+.container {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--background-color);
+  overflow: hidden;
+}
+
+.header {
+  background: var(--background-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: var(--spacing-md);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  
+  @media (max-width: 768px) {
+    padding: var(--spacing-sm);
+  }
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  max-width: 1200px;
+  margin: 0 auto;
+  
+  @media (max-width: 768px) {
+    gap: var(--spacing-sm);
+  }
+}
+
+.backButton {
+  flex-shrink: 0;
+  min-height: 40px;
+  
+  @media (max-width: 768px) {
+    min-height: 44px; // Better touch target
+    font-size: var(--font-size-sm);
+  }
+}
+
+.expertInfo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  min-width: 0;
+  
+  @media (max-width: 768px) {
+    gap: var(--spacing-sm);
+  }
+}
+
+.expertDetails {
+  flex: 1;
+  min-width: 0;
+  
+  .expertName {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-xs) 0;
+    
+    @media (max-width: 768px) {
+      font-size: var(--font-size-md);
+    }
+  }
+  
+  .tokenInfo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
+    
+    @media (max-width: 768px) {
+      flex-wrap: wrap;
+      gap: var(--spacing-xs);
+    }
+    
+    .token {
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      color: var(--accent-color);
+      background: rgba(59, 130, 246, 0.1);
+      padding: 2px 6px;
+      border-radius: var(--border-radius-sm);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      
+      @media (max-width: 768px) {
+        font-size: var(--font-size-xs);
+        padding: 1px 4px;
+      }
+    }
+    
+    .cost {
+      font-size: var(--font-size-xs);
+      color: var(--success-color);
+      font-weight: 600;
+      
+      @media (max-width: 768px) {
+        font-size: 10px;
+      }
+    }
+  }
+  
+  .expertDescription {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    
+    @media (max-width: 768px) {
+      font-size: var(--font-size-xs);
+      -webkit-line-clamp: 1;
+    }
+  }
+}
+
+.endButton {
+  flex-shrink: 0;
+  min-height: 40px;
+  
+  @media (max-width: 768px) {
+    min-height: 44px; // Better touch target
+    font-size: var(--font-size-sm);
+  }
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.chatInterface {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.errorContainer,
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-xl);
+  text-align: center;
+  
+  h1 {
+    font-size: var(--font-size-xl);
+    color: var(--text-primary);
+    margin: 0;
+  }
+  
+  p {
+    font-size: var(--font-size-lg);
+    color: var(--text-secondary);
+    margin: 0;
+  }
+}
+
+.errorToast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--danger-color);
+  color: white;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-base);
+  z-index: 1000;
+  box-shadow: var(--shadow-lg);
+  
+  @media (max-width: 768px) {
+    bottom: 20px;
+    right: 20px;
+    left: 20px;
+    text-align: center;
+  }
+}
+
+// Mobile-specific optimizations
+@media (max-width: 768px) {
+  .container {
+    height: 100vh; // Use viewport height on mobile
+    height: 100dvh; // Dynamic viewport height where supported
+  }
+  
+  .header {
+    // Reduce header height on mobile
+    padding-top: max(var(--spacing-sm), env(safe-area-inset-top));
+  }
+  
+  .main {
+    // Account for mobile browser chrome
+    padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom));
+  }
+}

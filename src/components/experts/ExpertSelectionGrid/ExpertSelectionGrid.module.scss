@@ -1,0 +1,65 @@
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-lg);
+  width: 100%;
+  padding: var(--spacing-md);
+  
+  // Mobile-first: single column on mobile
+  @media (min-width: 480px) {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    padding: var(--spacing-lg);
+  }
+  
+  // Tablet and up: responsive grid
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--spacing-xl);
+    padding: var(--spacing-xl);
+  }
+  
+  // Desktop: max 3 columns for optimal readability
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+}
+
+.gridItem {
+  width: 100%;
+  min-height: 0; // Prevents grid items from stretching
+  
+  .expertCard {
+    height: 100%;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    
+    // Mobile-first touch optimization
+    min-height: 120px;
+    touch-action: manipulation;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    &:active {
+      transform: translateY(0);
+      transition: transform 0.1s ease-in-out;
+    }
+    
+    // Larger touch targets on mobile
+    @media (max-width: 768px) {
+      min-height: 140px;
+      
+      &:hover {
+        transform: none; // Disable hover effects on touch devices
+      }
+      
+      &:active {
+        background-color: rgba(59, 130, 246, 0.05);
+      }
+    }
+  }
+}

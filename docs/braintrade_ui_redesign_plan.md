@@ -35,21 +35,21 @@ src/components/
 **Целевое**: Сетка выбора экспертов с индивидуальными карточками экспертов (Mobile-First)
 
 **Файлы для изменения:**
-- [ ] `src/app/page.tsx` - Полный редизайн для mobile-first выбора экспертов
-- [ ] `src/app/page.module.scss` - Обновление стилей для mobile-first сетки экспертов
-- [ ] `src/app/layout.tsx` - Обновление метаданных для BrainTrade
+- [x] `src/app/page.tsx` - Полный редизайн для mobile-first выбора экспертов
+- [x] `src/app/page.module.scss` - Обновление стилей для mobile-first сетки экспертов
+- [x] `src/app/layout.tsx` - Обновление метаданных для BrainTrade
 
 **Новые компоненты:**
-- [ ] `ExpertSelectionGrid` - Основной компонент главной страницы (Mobile-First)
-- [ ] `ExpertCard` - Отображение индивидуального эксперта (улучшить существующий для мобильных)
+- [x] `ExpertSelectionGrid` - Основной компонент главной страницы (Mobile-First)
+- [x] `ExpertCard` - Отображение индивидуального эксперта (улучшить существующий для мобильных)
 
 #### 1.2 Обновление структуры маршрутизации
 **Текущее**: Одностраничное приложение с модальной навигацией
 **Целевое**: Структура маршрутов `/chat/{expert}/{id}`
 
 **Файлы для создания:**
-- [ ] `src/app/chat/[expert]/[id]/page.tsx` - Страница чата с индивидуальным экспертом
-- [ ] `src/app/chat/[expert]/[id]/layout.tsx` - Обертка макета чата
+- [x] `src/app/chat/[expert]/[id]/page.tsx` - Страница чата с индивидуальным экспертом
+- [x] `src/app/chat/[expert]/[id]/layout.tsx` - Обертка макета чата
 
 **Файлы для изменения:**
 - [ ] `src/lib/constants/routes.ts` - Обновление определений маршрутов
@@ -59,9 +59,9 @@ src/components/
 **Целевое**: Индивидуальный выбор экспертов с интеграцией RAG
 
 **Файлы для изменения:**
-- [ ] `src/data/investment_experts.json` - Улучшение данных экспертов
-- [ ] `src/types/expert.ts` - Добавление свойств токенизации
-- [ ] `src/components/experts/ExpertCard/ExpertCard.tsx` - Редизайн для мобильного выбора
+- [x] `src/data/investment_experts.json` - Улучшение данных экспертов
+- [x] `src/types/expert.ts` - Добавление свойств токенизации
+- [x] `src/components/experts/ExpertCard/ExpertCard.tsx` - Редизайн для мобильного выбора
 
 ### Фаза 2: Упрощение системы чата (Mobile-First)
 

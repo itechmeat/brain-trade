@@ -346,43 +346,10 @@ export interface RagExpertAnalysisResult extends VentureAgentAnalysisResult {
   };
 }
 
-// Document Generation Types
-export interface DocumentGenerationResult {
-  document: string;
-  title: string;
-  confidence: number;
-  reasoning: string;
-  language: string; // Detected language (e.g. "Russian", "English")
-  assistantMessage: string; // Localized message about document creation
-}
-
-export const DocumentGenerationResultSchema = z.object({
-  document: z.string().min(1),
-  title: z.string().min(1),
-  confidence: z.number().min(0).max(100),
-  reasoning: z.string().min(1),
-  language: z.string().min(1),
-  assistantMessage: z.string().min(1),
-});
-
-// Assistant Message Generation Types
-export interface AssistantMessageGenerationResult {
-  assistantMessage: string;
-  language: string;
-}
-
-export const AssistantMessageGenerationResultSchema = z.object({
-  assistantMessage: z.string().min(1),
-  language: z.string().min(1),
-});
 
 // Expert Chat Response Types
 export interface ExpertChatResponse {
   message: string;
-  nextSpeaker?: string | null;
-  confidence: number;
-  investmentInterest: number;
-  recommendations?: string[]; // Array of specific actionable recommendations
   ragMetadata?: {
     contextChunks: number;
     totalTokens: number;
@@ -392,10 +359,6 @@ export interface ExpertChatResponse {
 
 export const ExpertChatResponseSchema = z.object({
   message: z.string().min(1),
-  nextSpeaker: z.string().nullable().optional(),
-  confidence: z.number().min(0).max(100),
-  investmentInterest: z.number().min(0).max(100),
-  recommendations: z.array(z.string().min(1)).optional(),
   ragMetadata: z
     .object({
       contextChunks: z.number(),

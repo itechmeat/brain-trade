@@ -16,12 +16,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Venture Chat - AI Investment Experts',
-  description: 'Get feedback on your business ideas from AI-powered investment experts',
+  title: 'BrainTrade - Tokenized Expert Consultations',
+  description: 'Personal consultations with AI experts on any topic. Select an expert and start a chat.',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Venture Chat',
+    title: 'BrainTrade',
   },
 };
 
@@ -44,7 +44,7 @@ export default function RootLayout({
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Venture Chat" />
+        <meta name="apple-mobile-web-app-title" content="BrainTrade" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="format-detection" content="telephone=no" />
         <link rel="apple-touch-icon" href="/icon-192.png" />

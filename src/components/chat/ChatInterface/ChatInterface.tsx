@@ -9,28 +9,16 @@ interface ChatInterfaceProps {
   session: ChatSession;
   experts: InvestmentExpert[];
   onSendMessage: (content: string) => void;
-  onEndSession?: () => void;
-  onReaction?: (messageId: string, reaction: 'like' | 'dislike' | null) => void;
-  onApplyRecommendations?: (messageId: string, selectedRecommendations: string[]) => void;
-  onStopQueue?: () => void;
-  onResumeQueue?: () => void;
   className?: string;
   isLoading?: boolean;
-  isApplyingRecommendations?: boolean;
-  currentSpeakers?: string[]; // slugs of currently responding experts
-  isQueueStopped?: boolean;
 }
 
 export function ChatInterface({
   session,
   experts,
   onSendMessage,
-  onReaction,
-  onApplyRecommendations,
   className = '',
   isLoading = false,
-  isApplyingRecommendations = false,
-  currentSpeakers,
 }: ChatInterfaceProps) {
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -74,32 +62,6 @@ export function ChatInterface({
     return experts.find(expert => expert.slug === expertId);
   };
 
-  const getLoadingMessage = () => {
-    if (currentSpeakers && currentSpeakers.length > 0) {
-      // Check if assistant is responding
-      if (currentSpeakers.includes('assistant')) {
-        return 'Assistant is updating the document';
-      }
-
-      const expertNames = currentSpeakers
-        .map(slug => {
-          const expert = getExpertById(slug);
-          return expert ? expert.name.replace(' (RAG)', '') : null;
-        })
-        .filter(Boolean);
-
-      if (expertNames.length === 1) {
-        return `${expertNames[0]} is responding`;
-      } else if (expertNames.length === 2) {
-        return `${expertNames[0]} and ${expertNames[1]} are responding`;
-      } else if (expertNames.length > 2) {
-        const lastExpert = expertNames.pop();
-        return `${expertNames.join(', ')}, and ${lastExpert} are responding`;
-      }
-    }
-    return 'Expert is responding';
-  };
-
   return (
     <div className={`${styles.chatInterface} ${className}`}>
       {/* Header */}
@@ -117,10 +79,6 @@ export function ChatInterface({
               key={message.id}
               message={message}
               expert={message.expertId ? getExpertById(message.expertId) : undefined}
-              appliedRecommendations={session.appliedRecommendations || []}
-              isApplyingRecommendations={isApplyingRecommendations}
-              onReaction={onReaction}
-              onApplyRecommendations={onApplyRecommendations}
             />
           ))}
 
@@ -131,7 +89,7 @@ export function ChatInterface({
                 <span></span>
                 <span></span>
               </div>
-              <span>{getLoadingMessage()}</span>
+              <span>Expert is responding...</span>
             </div>
           )}
 
@@ -147,7 +105,7 @@ export function ChatInterface({
             value={newMessage}
             onChange={e => setNewMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask experts a question..."
+            placeholder="Ask the expert a question..."
             rows={3}
             disabled={false}
             className={styles.messageInput}
