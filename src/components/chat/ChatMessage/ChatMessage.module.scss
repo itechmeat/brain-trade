@@ -1,0 +1,253 @@
+.chatMessage {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  animation: fadeIn 0.3s ease-in-out;
+
+  &.sending {
+    opacity: 0.7;
+  }
+
+  &.error {
+    .content {
+      background-color: var(--background-color);
+      border-color: var(--danger-light);
+    }
+  }
+}
+
+.user {
+  flex-direction: row-reverse;
+
+  .content {
+    background: linear-gradient(135deg, var(--accent-color) 0%, #3b82f6 100%);
+    color: white;
+    border-radius: var(--border-radius-xl) var(--border-radius-xl) var(--border-radius-md) var(--border-radius-xl);
+    max-width: 70%;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .header {
+    .userName {
+      color: rgba(255, 255, 255, 0.9);
+    }
+  }
+
+  .footer {
+    margin-top: var(--spacing-sm);
+
+    .timestamp {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .status {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+}
+
+.expert {
+  flex-direction: row;
+
+  .content {
+    background: linear-gradient(135deg, var(--background-color) 0%, var(--background-secondary) 100%);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md) var(--border-radius-xl) var(--border-radius-xl) var(--border-radius-xl);
+    max-width: 80%;
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.system {
+  justify-content: center;
+
+  .content {
+    background: linear-gradient(135deg, var(--warning-light) 0%, #fef3c7 100%);
+    border: 1px solid var(--warning-color);
+    border-radius: var(--border-radius-lg);
+    text-align: center;
+    font-style: italic;
+    color: #92400e;
+    max-width: 60%;
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.avatar {
+  flex-shrink: 0;
+  margin-top: var(--spacing-xs);
+}
+
+.content {
+  padding: var(--spacing-md) var(--spacing-lg);
+  word-wrap: break-word;
+  position: relative;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: 6px;
+
+  .expertName {
+    font-weight: 600;
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
+  }
+
+  .expertRole {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+  }
+
+  .userName {
+    font-weight: 600;
+    font-size: var(--font-size-base);
+  }
+}
+
+.messageContent {
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  margin-bottom: var(--spacing-sm);
+  white-space: pre-wrap;
+}
+
+.recommendations {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, var(--background-tertiary) 0%, var(--accent-light) 100%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+
+  .recommendationsTitle {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-sm) 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .recommendationsList {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+
+    .recommendationItem {
+      position: relative;
+      padding: 0;
+
+      &:not(:last-child) {
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: var(--spacing-sm);
+      }
+    }
+  }
+
+  .completedRecommendation {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-xs) 0;
+
+    .checkmark {
+      font-size: var(--font-size-lg);
+      flex-shrink: 0;
+    }
+
+    .completedText {
+      font-size: var(--font-size-base);
+      color: var(--text-secondary);
+      text-decoration: line-through;
+      opacity: 0.8;
+    }
+  }
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+
+  .timestamp {
+    color: var(--text-tertiary);
+  }
+
+  .status {
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  .confidence {
+    color: var(--success-color);
+    font-weight: 500;
+  }
+
+  .investmentInterest {
+    color: var(--danger-color);
+    font-weight: 500;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .chatMessage {
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .content {
+    padding: 10px var(--spacing-md);
+  }
+
+  .user .content,
+  .expert .content {
+    max-width: 100%;
+  }
+
+  .system .content {
+    max-width: 90%;
+  }
+
+  .messageContent {
+    font-size: var(--font-size-md);
+  }
+
+  .recommendations {
+    margin-top: 10px;
+    padding: 10px;
+
+    .recommendationsTitle {
+      font-size: var(--font-size-xs);
+      margin-bottom: 6px;
+    }
+  }
+
+  .header {
+    .expertName,
+    .userName {
+      font-size: var(--font-size-md);
+    }
+
+    .expertRole {
+      font-size: var(--font-size-xs);
+    }
+  }
+}

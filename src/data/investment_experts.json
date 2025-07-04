@@ -1,0 +1,59 @@
+[
+  {
+    "name": "Ben Horowitz",
+    "slug": "bhorowitz",
+    "collection": "ben-horowitz",
+    "fund": "Andreessen Horowitz (a16z)",
+    "methodology": "RAG-based analysis using proven venture capital investment methodologies with vector search across expert knowledge base",
+    "expertise": "AI-powered team and leadership analysis, market opportunity assessment, strategic planning, risk management, business scaling",
+    "focus": "All stages of startup development with focus on analysis based on proven expert venture capital investment methodologies",
+    "price": 1.3,
+    "photo": "/experts/bhorowitz.jpg",
+    "website": "https://a16z.com",
+    "twitter": "@bhorowitz",
+    "isRagExpert": true,
+    "ragConfig": {
+      "topK": 5,
+      "scoreThreshold": 0.3,
+      "maxContextLength": 4000
+    }
+  },
+  {
+    "name": "Peter Thiel",
+    "slug": "peterthiel",
+    "collection": "peter-thiel",
+    "fund": "Founders Fund",
+    "methodology": "RAG-based analysis using proven venture capital investment methodologies with vector search across expert knowledge base",
+    "expertise": "Deep technology, breakthrough innovations, contrarian market analysis, monopoly business model development",
+    "focus": "Early-stage deep tech companies with potential for creating new markets and achieving monopolistic positions",
+    "price": 1.4,
+    "photo": "/experts/peterthiel.jpg",
+    "website": "https://foundersfund.com",
+    "twitter": "@peterthiel",
+    "isRagExpert": true,
+    "ragConfig": {
+      "topK": 5,
+      "scoreThreshold": 0.3,
+      "maxContextLength": 4000
+    }
+  },
+  {
+    "name": "Steve Blank",
+    "slug": "sgblank",
+    "collection": "stev-blank",
+    "fund": "America's Frontier Fund",
+    "methodology": "RAG-based analysis using proven venture capital investment methodologies with vector search across expert knowledge base",
+    "expertise": "Customer development, lean startup methodology, business model validation, market testing strategies",
+    "focus": "All stages of startup development with emphasis on customer discovery and validation",
+    "price": 0.9,
+    "photo": "/experts/sgblank.jpg",
+    "website": "https://steveblank.com",
+    "twitter": "@sgblank",
+    "isRagExpert": true,
+    "ragConfig": {
+      "topK": 5,
+      "scoreThreshold": 0.3,
+      "maxContextLength": 4000
+    }
+  }
+]
