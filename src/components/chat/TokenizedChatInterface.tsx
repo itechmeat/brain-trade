@@ -476,7 +476,6 @@ export function TokenizedChatInterface({
         onOpenChange={setShowPurchaseModal}
         title={`Buy ${selectedExpert?.symbol} tokens`}
         description={`Purchase tokens for consultation with ${selectedExpert?.name}`}
-        size="md"
       >
         {selectedExpert && (
           <TokenPurchase

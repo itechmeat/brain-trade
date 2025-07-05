@@ -8,7 +8,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTokenizedChat } from '@/hooks/useTokenizedChat';
 import { useContracts } from '@/hooks/useContracts';
-import { usePrivy, useWallets } from '@privy-io/react-auth';
+import { useTokenBalances } from '@/hooks/useTokenBalances';
+import { usePrivy } from '@privy-io/react-auth';
 import { MarketplaceExpert } from '@/types/marketplace';
 import { convertInvestmentExpertToExpertInfo } from '@/lib/marketplace-adapter';
 import { SimpleMessageInput } from '../SimpleMessageInput';
@@ -56,14 +57,12 @@ export function MarketplaceTokenizedChatInterface({
   // Tokenized chat hook
   const {
     currentSession,
-    tokenBalance,
     canAffordConsultation,
     processingConsultation,
     consultationSession,
     contractsReady,
     loading,
     error,
-    loadTokenBalance,
     sendTokenizedMessage,
     startTokenizedConsultation,
   } = useTokenizedChat();
@@ -71,15 +70,30 @@ export function MarketplaceTokenizedChatInterface({
   // Blockchain hooks
   const { isCorrectChain, switchNetwork, experts, loadExperts, isReady, clearBalanceCache } =
     useContracts();
+  const { loadBalance, isLoaded, getBalance } = useTokenBalances();
 
   // Privy hooks
-  const { logout, connectWallet } = usePrivy();
-  const { wallets } = useWallets();
+  const { connectWallet } = usePrivy();
 
   // State
   const [hasStartedChat, setHasStartedChat] = useState(false);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [balanceLoading, setBalanceLoading] = useState(false);
+
+  // Stable handler for buy tokens
+  const handleBuyTokensClick = useCallback(() => {
+    console.log('🔘 Buy tokens button clicked');
+    setShowPurchaseModal(true);
+  }, []);
+
+  // Find corresponding blockchain expert for purchasing
+  const blockchainExpert = expertInfo && experts.length > 0 
+    ? experts.find(e => e.symbol === expertInfo.symbol) 
+    : null;
+
+  // Get balance using useTokenBalances like on main page
+  const marketplaceBalance = getBalance(expertInfo?.symbol || '');
+  const balanceLoaded = isLoaded(expertInfo?.symbol || '');
 
   // Load experts on initialization (only once)
   useEffect(() => {
@@ -87,23 +101,25 @@ export function MarketplaceTokenizedChatInterface({
       console.log('📋 Loading experts from marketplace...');
       loadExperts();
     }
-  }, [isReady, experts.length, loading, loadExperts]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isReady, experts.length, loading]);
 
-  // Load balance when expert changes
+  // Load balance when expert changes using useTokenBalances like main page
   useEffect(() => {
-    if (expertInfo && contractsReady && expertInfo.tokenAddress) {
-      console.log(
-        '🔍 Loading token balance for marketplace expert:',
-        expertInfo.name,
-        expertInfo.symbol,
-        expertInfo.tokenAddress,
-      );
-      setBalanceLoading(true);
-      loadTokenBalance(expertInfo).finally(() => setBalanceLoading(false));
-    } else if (expertInfo && !expertInfo.tokenAddress) {
-      console.warn('⚠️ Selected marketplace expert has no token address:', expertInfo);
+    if (expertInfo && contractsReady && experts.length > 0) {
+      const blockchainExpert = experts.find(e => e.symbol === expertInfo.symbol);
+      if (blockchainExpert) {
+        console.log(
+          '🔍 Loading token balance for marketplace expert:',
+          expertInfo.name,
+          expertInfo.symbol,
+        );
+        setBalanceLoading(true);
+        loadBalance(blockchainExpert).finally(() => setBalanceLoading(false));
+      }
     }
-  }, [expertInfo, contractsReady, loadTokenBalance]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expertInfo?.symbol, contractsReady, experts.length]);
 
   // Reset chat state when expert changes
   useEffect(() => {
@@ -111,6 +127,11 @@ export function MarketplaceTokenizedChatInterface({
       setHasStartedChat(false);
     }
   }, [selectedExpert]);
+
+  // Debug modal state changes
+  useEffect(() => {
+    console.log('💬 Modal state changed:', showPurchaseModal);
+  }, [showPurchaseModal]);
 
   /**
    * Handle tokenized message sending
@@ -177,7 +198,11 @@ export function MarketplaceTokenizedChatInterface({
       // Delay to ensure transaction is confirmed on blockchain
       setTimeout(async () => {
         try {
-          await loadTokenBalance(expertInfo, true); // Force refresh after purchase
+          // Reload balance using useTokenBalances
+          const blockchainExpert = experts.find(e => e.symbol === expertInfo.symbol);
+          if (blockchainExpert) {
+            await loadBalance(blockchainExpert, true); // Force refresh after purchase
+          }
           console.log('✅ Marketplace balance reloaded after purchase');
         } catch (error) {
           console.error('❌ Failed to reload marketplace balance:', error);
@@ -186,7 +211,7 @@ export function MarketplaceTokenizedChatInterface({
         }
       }, 1000); // Increased delay to 1 second for blockchain confirmation
     }
-  }, [expertInfo, loadTokenBalance, clearBalanceCache]);
+  }, [expertInfo, experts, loadBalance, clearBalanceCache]);
 
   /**
    * Handle purchase error
@@ -213,13 +238,8 @@ export function MarketplaceTokenizedChatInterface({
       <Card className={styles.connectWallet}>
         <h3>Connect Wallet</h3>
         <p>To use marketplace tokenized chat, you need to connect your wallet</p>
-        <div className={styles.walletActions}>
+        <div className={styles.connectActions}>
           <Button onClick={connectWallet}>Connect Wallet</Button>
-          {wallets.length > 0 && (
-            <Button variant="outline" onClick={logout}>
-              Switch Wallet
-            </Button>
-          )}
         </div>
       </Card>
     );
@@ -250,26 +270,42 @@ export function MarketplaceTokenizedChatInterface({
 
   return (
     <div className={styles.marketplaceTokenizedChat}>
-      {/* Wallet management */}
-      <div className={styles.walletActions}>
-        <Button variant="outline" size="sm" onClick={logout}>
-          Switch Wallet
-        </Button>
-      </div>
-
-      {/* Token information */}
-      <div className={styles.tokenInfo}>
-        <Card className={styles.tokenCard}>
+      {/* Expert card - matching main page style */}
+      <div className={styles.expertCardContainer}>
+        <div className={styles.expertCard}>
           <div className={styles.expertHeader}>
+            <SimpleExpertAvatar expert={expertInfo} size="large" />
             <div className={styles.expertInfo}>
-              <SimpleExpertAvatar expert={expertInfo} size="medium" />
-              <div>
-                <h4>{expertInfo.name}</h4>
-                <p className={styles.category}>{expertInfo.category}</p>
-                <p className={styles.fund}>{selectedExpert.fund}</p>
+              <h4>{expertInfo.name}</h4>
+              <p className={styles.fund}>{selectedExpert.fund}</p>
+              <p className={styles.expertise}>{selectedExpert.description}</p>
+              <div className={styles.pricing}>
+                <div className={styles.pricingLeft}>
+                  <span className={styles.cost}>
+                    <ConsultationCost
+                      cost={expertInfo.tokensPerQuery}
+                      symbol={expertInfo.symbol}
+                      isWeiFormat={false}
+                      size="small"
+                    /> per message
+                  </span>
+                </div>
+                <div className={styles.pricingRight}>
+                  <div className={styles.userBalance}>
+                    <TokenBalance
+                      balance={marketplaceBalance}
+                      loading={!balanceLoaded}
+                      symbol={expertInfo.symbol}
+                      size="medium"
+                      showAffordability={false}
+                      showIcon={true}
+                      iconSize={24}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-
+            
             {/* Debug button for clearing cache */}
             {showDebugInfo && (
               <button onClick={clearBalanceCache} className={styles.debugButton} type="button">
@@ -278,55 +314,42 @@ export function MarketplaceTokenizedChatInterface({
             )}
           </div>
 
-          <div className={styles.tokenBalance}>
-            <div className={styles.balanceRow}>
-              <span>Your balance:</span>
-              <TokenBalance
-                balance={tokenBalance}
-                loading={balanceLoading}
-                symbol={expertInfo.symbol}
-                size="medium"
-                showAffordability={true}
-              />
-            </div>
+          {/* Action buttons */}
+          <div className={styles.tokenActions}>
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={handleBuyTokensClick}
+              className={styles.actionButton}
+              type="button"
+            >
+              Buy tokens
+            </Button>
 
-            <div className={styles.balanceRow}>
-              <span>Consultation cost:</span>
-              <ConsultationCost
-                cost={BigInt(expertInfo.tokensPerQuery)}
-                symbol={expertInfo.symbol}
-                isWeiFormat={true}
-                size="medium"
-              />
-            </div>
-
-            {/* Always show buy tokens button */}
-            <div className={styles.tokenActions}>
-              <Button size="sm" variant="outline" onClick={() => setShowPurchaseModal(true)}>
-                Buy tokens
-              </Button>
-
-              {/* Tips button - always visible */}
-              {expertInfo && (
+            {/* Tips button - same size */}
+            {expertInfo && (
+              <div className={styles.tipButtonWrapper}>
                 <TipButton
                   expert={expertInfo}
-                  tokenBalance={tokenBalance}
+                  tokenBalance={marketplaceBalance || null}
                   onTipSent={() => {
                     // Reload balance after tip is sent
-                    loadTokenBalance(expertInfo, true);
+                    if (experts.find(e => e.symbol === expertInfo.symbol)) {
+                      loadBalance(experts.find(e => e.symbol === expertInfo.symbol)!, true);
+                    }
                   }}
                   disabled={processingConsultation || balanceLoading}
                 />
-              )}
+              </div>
+            )}
 
-              {!canAffordConsultation && tokenBalance && (
-                <span className={styles.insufficientWarning}>
-                  Insufficient tokens for consultation
-                </span>
-              )}
-            </div>
+            {marketplaceBalance && marketplaceBalance.balance < BigInt(expertInfo.tokensPerQuery) && (
+              <span className={styles.insufficientWarning}>
+                Insufficient tokens for consultation
+              </span>
+            )}
           </div>
-        </Card>
+        </div>
       </div>
 
       {/* Debug info */}
@@ -396,7 +419,7 @@ export function MarketplaceTokenizedChatInterface({
                           </span>
                         )}
                         {message.metadata.transactionHash && (
-                          <div style={{ marginTop: '4px' }}>
+                          <div className={styles.transactionLink}>
                             💰 Paid with:{' '}
                             <TransactionLink
                               hash={message.metadata.transactionHash}
@@ -477,14 +500,17 @@ export function MarketplaceTokenizedChatInterface({
         onOpenChange={setShowPurchaseModal}
         title={`Buy ${expertInfo?.symbol} tokens`}
         description={`Purchase tokens for consultation with ${expertInfo?.name}`}
-        size="md"
       >
-        {expertInfo && (
+        {blockchainExpert ? (
           <TokenPurchase
-            expert={expertInfo}
+            expert={blockchainExpert}
             onPurchaseSuccess={handlePurchaseSuccess}
             onPurchaseError={handlePurchaseError}
           />
+        ) : (
+          <div style={{ padding: '20px', textAlign: 'center' }}>
+            {experts.length === 0 ? 'Loading blockchain contracts...' : `Expert ${expertInfo?.symbol} not found in contracts`}
+          </div>
         )}
       </Dialog>
     </div>

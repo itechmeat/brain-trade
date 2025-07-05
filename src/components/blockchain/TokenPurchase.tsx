@@ -7,7 +7,7 @@
 import { useState, useCallback } from 'react';
 import { useContracts } from '@/hooks/useContracts';
 import { ExpertInfo } from '@/types/contracts';
-import { Button, Card, ConsultationCost } from '@/components/ui';
+import { Button, ConsultationCost } from '@/components/ui';
 import { TOKEN_SETTINGS, formatTokenAmount } from '@/lib/blockchain/config';
 import styles from './TokenPurchase.module.scss';
 
@@ -27,7 +27,6 @@ export function TokenPurchase({ expert, onPurchaseSuccess, onPurchaseError }: To
   const { purchaseTokens, loading } = useContracts();
 
   const [selectedAmount, setSelectedAmount] = useState<bigint | null>(null);
-  const [customAmount, setCustomAmount] = useState('');
   const [purchasing, setPurchasing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -68,37 +67,20 @@ export function TokenPurchase({ expert, onPurchaseSuccess, onPurchaseError }: To
     [expert.tokenAddress, purchasing, purchaseTokens, onPurchaseSuccess, onPurchaseError],
   );
 
-  /**
-   * Custom amount purchase
-   */
-  const handleCustomPurchase = useCallback(async () => {
-    const amount = customAmount ? BigInt(parseInt(customAmount)) * BigInt(10) ** BigInt(18) : null;
-    if (!amount || amount <= 0) {
-      onPurchaseError?.('Please enter a valid amount');
-      return;
-    }
-
-    await handlePurchase(amount);
-  }, [customAmount, handlePurchase, onPurchaseError]);
 
   return (
-    <Card className={styles.tokenPurchase}>
-      <div className={styles.header}>
-        <h3>Buy {expert.symbol} tokens</h3>
-        <p className={styles.expertName}>{expert.name}</p>
-        <div className={styles.costInfo}>
-          Consultation cost:{' '}
-          <ConsultationCost
-            cost={expert.tokensPerQuery}
-            symbol={expert.symbol}
-            isWeiFormat={true}
-            size="medium"
-          />
-        </div>
+    <div className={styles.tokenPurchase}>
+      <div className={styles.costInfo}>
+        Consultation cost:{' '}
+        <ConsultationCost
+          cost={expert.tokensPerQuery}
+          symbol={expert.symbol}
+          isWeiFormat={true}
+          size="medium"
+        />
       </div>
 
       <div className={styles.suggestions}>
-        <h4>Recommended amounts:</h4>
         <div className={styles.suggestionButtons}>
           {TOKEN_SETTINGS.purchaseSuggestions.map(suggestion => (
             <Button
@@ -115,51 +97,26 @@ export function TokenPurchase({ expert, onPurchaseSuccess, onPurchaseError }: To
 
         {selectedAmount && (
           <div className={styles.selectedInfo}>
-            <p>
-              Selected: {formatTokenAmount(selectedAmount)} {expert.symbol}
-            </p>
-            <p>
-              Consultations:{' '}
-              {Math.floor(Number(formatTokenAmount(selectedAmount)) / expert.tokensPerQuery)}
-            </p>
-            <Button
-              onClick={() => handlePurchase(selectedAmount)}
-              disabled={purchasing || loading}
-              loading={purchasing}
-            >
-              Buy {formatTokenAmount(selectedAmount)} tokens
-            </Button>
+            <div className={styles.textInfo}>
+              <p>
+                Selected: {formatTokenAmount(selectedAmount)} {expert.symbol}
+              </p>
+              <p>
+                Consultations:{' '}
+                {Math.floor(Number(formatTokenAmount(selectedAmount)) / expert.tokensPerQuery)}
+              </p>
+            </div>
+            <div className={styles.buyButton}>
+              <Button
+                onClick={() => handlePurchase(selectedAmount)}
+                disabled={purchasing || loading}
+                loading={purchasing}
+              >
+                Buy {formatTokenAmount(selectedAmount)} tokens
+              </Button>
+            </div>
           </div>
         )}
-      </div>
-
-      <div className={styles.customAmount}>
-        <h4>Or enter your own amount:</h4>
-        <div className={styles.customInput}>
-          <input
-            type="number"
-            value={customAmount}
-            onChange={e => setCustomAmount(e.target.value)}
-            placeholder="Number of tokens"
-            min="1"
-            disabled={purchasing || loading}
-          />
-          <Button
-            onClick={handleCustomPurchase}
-            disabled={!customAmount || purchasing || loading}
-            loading={purchasing}
-            size="sm"
-          >
-            Buy
-          </Button>
-        </div>
-      </div>
-
-      <div className={styles.disclaimer}>
-        <p>
-          💡 <strong>For hackathon:</strong> Token purchase is simplified. In production, real
-          payment integration will be used.
-        </p>
       </div>
 
       {/* Error display */}
@@ -191,6 +148,6 @@ export function TokenPurchase({ expert, onPurchaseSuccess, onPurchaseError }: To
           </div>
         </div>
       )}
-    </Card>
+    </div>
   );
 }

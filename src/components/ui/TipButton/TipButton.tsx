@@ -84,7 +84,6 @@ export function TipButton({ expert, tokenBalance, onTipSent, disabled }: TipButt
         onOpenChange={setIsDialogOpen}
         title="Confirm Tip"
         description={`Send a tip to ${expert.name} for their expert consultation`}
-        size="md"
       >
         {tipCalculation && (
           <div className={styles.tipDetails}>
