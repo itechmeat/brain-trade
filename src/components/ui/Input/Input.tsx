@@ -17,6 +17,9 @@ export interface InputProps {
   error?: string;
   label?: string;
   size?: 'sm' | 'md' | 'lg';
+  min?: string | number;
+  max?: string | number;
+  step?: string | number;
 }
 
 export function Input({
@@ -34,7 +37,10 @@ export function Input({
   className = '',
   error,
   label,
-  size = 'md'
+  size = 'md',
+  min,
+  max,
+  step,
 }: InputProps) {
   return (
     <div className={`${styles.inputWrapper} ${className}`}>
@@ -56,6 +62,9 @@ export function Input({
         onBlur={onBlur}
         disabled={disabled}
         required={required}
+        min={min}
+        max={max}
+        step={step}
         className={`${styles.input} ${styles[size]} ${error ? styles.error : ''} ${disabled ? styles.disabled : ''}`}
       />
       {error && <span className={styles.errorText}>{error}</span>}

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { Theme } from '@radix-ui/themes';
 import { PrivyProvider } from '@/providers/PrivyProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
+import { ToastProvider } from '@/providers/ToastProvider';
 import './globals.css';
 import '@radix-ui/themes/styles.css';
 
@@ -55,9 +56,11 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <PrivyProvider>
           <QueryProvider>
-            <Theme accentColor="blue" grayColor="gray" radius="medium">
-              {children}
-            </Theme>
+            <ToastProvider>
+              <Theme accentColor="blue" grayColor="gray" radius="medium">
+                {children}
+              </Theme>
+            </ToastProvider>
           </QueryProvider>
         </PrivyProvider>
       </body>

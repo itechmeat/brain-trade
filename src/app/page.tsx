@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { MarketplaceExpertSelector } from '@/components/experts';
 import { AuthButton } from '@/components/auth';
 import investmentExperts from '@/data/investment_experts.json';
@@ -42,12 +41,6 @@ export default function Home() {
       <main className={styles.main}>
         <MarketplaceExpertSelector experts={experts} loading={loading} />
       </main>
-
-      <footer className={styles.footer}>
-        <Link href="/tokenized-chat" className={styles.tokenizedLink}>
-          🪙 Tokenized consultations
-        </Link>
-      </footer>
     </div>
   );
 }

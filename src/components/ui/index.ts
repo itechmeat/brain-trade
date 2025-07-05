@@ -9,6 +9,9 @@ export { LoadingSpinner } from './LoadingSpinner/LoadingSpinner';
 export { NetworkStatus } from './NetworkStatus/NetworkStatus';
 export { TipButton } from './TipButton/TipButton';
 export { TransactionLink } from './TransactionLink/TransactionLink';
+export { Toast } from './Toast/Toast';
+export { Switch } from './Switch/Switch';
+export { PublicChatSwitch } from './PublicChatSwitch/PublicChatSwitch';
 
 export type { ButtonProps } from './Button/Button';
 export type { InputProps } from './Input/Input';

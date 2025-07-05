@@ -21,7 +21,7 @@ interface MarketplaceChatPageProps {
 
 export default function MarketplaceChatPage({ params }: MarketplaceChatPageProps) {
   const [expertSlug, setExpertSlug] = useState<string>('');
-  const [, setChatId] = useState<string>('');
+  const [chatId, setChatId] = useState<string>('');
   const [selectedExpert, setSelectedExpert] = useState<MarketplaceExpert | null>(null);
   const { loadExperts, isReady } = useContracts();
 
@@ -91,7 +91,11 @@ export default function MarketplaceChatPage({ params }: MarketplaceChatPageProps
         </div>
       </header>
       <main className={styles.main}>
-        <MarketplaceTokenizedChatInterface selectedExpert={selectedExpert} />
+        <MarketplaceTokenizedChatInterface
+          selectedExpert={selectedExpert}
+          expertSlug={expertSlug}
+          chatId={chatId}
+        />
       </main>
     </div>
   );

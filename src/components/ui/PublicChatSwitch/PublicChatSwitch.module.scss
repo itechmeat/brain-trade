@@ -1,0 +1,57 @@
+.publicChatSwitch {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 44px;
+}
+
+.switchContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.copyButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: var(--accent-light);
+    color: var(--primary);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  span {
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+.copyIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}

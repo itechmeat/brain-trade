@@ -21,6 +21,7 @@ export const PrivyProvider = ({ children }: PrivyProviderProps) => {
         embeddedWallets: {
           createOnLogin: 'all-users', // Create for all users, including those with MetaMask
           showWalletUIs: false, // Disable confirmation modals for automatic signing
+          requireUserPasswordOnCreate: false, // Skip password for faster wallet creation
         },
 
         // Automatic network connection

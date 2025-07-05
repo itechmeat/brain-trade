@@ -24,6 +24,7 @@ import {
 } from '@/lib/blockchain/config';
 import { ethers } from 'ethers';
 import { switchToCorrectNetwork, hasProviderSend } from '@/utils/network';
+import { getEmbeddedWallet, hasEmbeddedWallet, getWalletTypeDescription } from '@/utils/wallet';
 
 // Types for wallet provider methods (using imported utility)
 
@@ -62,7 +63,15 @@ export function useContracts() {
       }
 
       try {
-        const wallet = wallets[0];
+        // Use embedded wallet for automatic signing
+        const wallet = getEmbeddedWallet(wallets);
+
+        if (!wallet) {
+          throw new Error('No wallet available');
+        }
+
+        console.log('🔍 Wallet info:', getWalletTypeDescription(wallet));
+
         const provider = await wallet.getEthereumProvider();
 
         if (!provider) {
@@ -518,6 +527,10 @@ export function useContracts() {
         // Convert consultation ID to number for contract
         const consultationIdNum = BigInt(consultationId.replace(/\D/g, '') || Date.now());
 
+        const currentWallet = getEmbeddedWallet(wallets);
+        console.log('💰 Starting consultation with:', getWalletTypeDescription(currentWallet!));
+        console.log('🔍 Has embedded wallet:', hasEmbeddedWallet(wallets));
+
         const tx = await tokenContract.startConsultation(consultationIdNum);
         const receipt = await tx.wait();
 
@@ -554,7 +567,7 @@ export function useContracts() {
         setLoading(false);
       }
     },
-    [signer, getExpertTokenContract],
+    [signer, getExpertTokenContract, wallets],
   );
 
   /**
