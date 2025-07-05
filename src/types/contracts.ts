@@ -74,6 +74,8 @@ export interface ExpertTokenContract {
   completeConsultation(user: string, consultationId: bigint): Promise<any>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   updateConsultationCost(newCost: bigint): Promise<any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  sendTip(amount: bigint): Promise<any>;
 
   // ERC-20 standard functions
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -228,10 +230,12 @@ export const EXPERT_TOKEN_ABI = [
   'function purchaseTokens(uint256) payable',
   'function startConsultation(uint256) returns (bool)',
   'function completeConsultation(address, uint256)',
+  'function sendTip(uint256)',
 
   // Events
   'event ConsultationStarted(address indexed user, uint256 tokenAmount, uint256 consultationId)',
   'event ConsultationCompleted(address indexed user, uint256 consultationId)',
+  'event TipSent(address indexed from, address indexed to, uint256 amount)',
 ] as const;
 
 export const EXPERT_FACTORY_ABI = [

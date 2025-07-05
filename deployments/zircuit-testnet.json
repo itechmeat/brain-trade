@@ -1,0 +1,29 @@
+{
+  "network": "zircuit-testnet",
+  "chainId": "48898",
+  "expertFactory": "0x1Ea3D4262813191d3C32584a5E71ead22107ceAE",
+  "platformAddress": "0x7404555145Ce95D5d78e9d0Df748E1BBe5605EFA",
+  "deployedAt": "2025-07-05T11:12:08.368Z",
+  "deployer": "0x7404555145Ce95D5d78e9d0Df748E1BBe5605EFA",
+  "experts": [
+    {
+      "name": "Ben Horowitz",
+      "symbol": "btBEN",
+      "tokenAddress": "0x83621b2dD173BE424e78FC1D68816707cfcEd668",
+      "consultationCost": "15.0"
+    },
+    {
+      "name": "Peter Thiel",
+      "symbol": "btTHIEL",
+      "tokenAddress": "0xC3edF23e94b6DECD8Aee1DeBCe9b0A0Bc829839d",
+      "consultationCost": "20.0"
+    },
+    {
+      "name": "Steve Blank",
+      "symbol": "btBLANK",
+      "tokenAddress": "0x244F8703070e4063b93aa34bf677E5DdeF12F5c1",
+      "consultationCost": "10.0"
+    }
+  ],
+  "note": "Production deployment with correct token amounts in wei format"
+}

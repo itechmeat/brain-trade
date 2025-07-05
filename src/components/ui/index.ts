@@ -7,6 +7,8 @@ export { TokenBalance } from './TokenBalance/TokenBalance';
 export { ConsultationCost } from './ConsultationCost/ConsultationCost';
 export { LoadingSpinner } from './LoadingSpinner/LoadingSpinner';
 export { NetworkStatus } from './NetworkStatus/NetworkStatus';
+export { TipButton } from './TipButton/TipButton';
+export { TransactionLink } from './TransactionLink/TransactionLink';
 
 export type { ButtonProps } from './Button/Button';
 export type { InputProps } from './Input/Input';

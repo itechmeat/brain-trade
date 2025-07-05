@@ -558,6 +558,76 @@ export function useContracts() {
   );
 
   /**
+   * Send tip to expert
+   */
+  const sendTip = useCallback(
+    async (tokenAddress: string, tipAmount: bigint): Promise<ContractCallResult> => {
+      if (!signer) {
+        return {
+          success: false,
+          error: BLOCKCHAIN_ERRORS.contractNotFound,
+        };
+      }
+
+      try {
+        setLoading(true);
+        const tokenContract = getExpertTokenContract(tokenAddress);
+
+        if (!tokenContract) {
+          return {
+            success: false,
+            error: BLOCKCHAIN_ERRORS.contractNotFound,
+          };
+        }
+
+        const tx = await tokenContract.sendTip(tipAmount);
+        const receipt = await tx.wait();
+
+        // Clear cache for this token after tip
+        const address = await signer.getAddress();
+        const cacheKey = `${tokenAddress}_${address}`;
+        setTokenBalancesCache(prev => {
+          const newCache = new Map(prev);
+          newCache.delete(cacheKey);
+          return newCache;
+        });
+        console.log('🗑️ Cleared cache for', cacheKey, 'after tip');
+
+        return {
+          success: true,
+          data: 'Tip sent successfully!',
+          transaction: {
+            hash: receipt.hash,
+            blockNumber: receipt.blockNumber,
+            gasUsed: receipt.gasUsed,
+          },
+        };
+      } catch (err) {
+        const error = err as { code?: string; message?: string };
+        let errorMessage = error.message || BLOCKCHAIN_ERRORS.transactionFailed;
+
+        // Improve error messages for common issues
+        if (error.code === 'ACTION_REJECTED') {
+          errorMessage = BLOCKCHAIN_ERRORS.userRejected;
+        } else if (error.message?.includes('Insufficient balance')) {
+          errorMessage = 'Insufficient tokens for tip';
+        } else if (error.message?.includes('insufficient funds')) {
+          errorMessage =
+            'Insufficient ETH for gas fees. Please add ETH to your wallet and try again.';
+        }
+
+        return {
+          success: false,
+          error: errorMessage,
+        };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [signer, getExpertTokenContract],
+  );
+
+  /**
    * Switch to correct network
    */
   const switchNetwork = useCallback(async (): Promise<ContractCallResult> => {
@@ -638,6 +708,7 @@ export function useContracts() {
     getTokenBalance,
     purchaseTokens,
     startConsultation,
+    sendTip,
     switchNetwork,
     clearBalancesCache,
     clearBalanceCache,
