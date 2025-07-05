@@ -3,10 +3,7 @@
  */
 
 .messageInput {
-  background: var(--surface-primary);
-  border-radius: 12px;
-  border: 1px solid var(--border-primary);
-  padding: 16px;
+  // Убираем всю стилизацию обертки - только содержимое
 }
 
 .inputWrapper {
@@ -22,28 +19,37 @@
   max-height: 200px;
 }
 
-.sendButton {
+.rightSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 8px;
   flex-shrink: 0;
-  align-self: flex-end;
 }
 
 .hint {
-  margin-top: 8px;
   font-size: 12px;
   color: var(--text-secondary);
-  text-align: center;
+  white-space: nowrap;
+}
+
+.sendButton {
+  flex-shrink: 0;
 }
 
 // Responsiveness
 @media (max-width: 768px) {
-  .messageInput {
-    padding: 12px;
-  }
-
   .inputWrapper {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
+  }
+
+  .rightSection {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .textarea {

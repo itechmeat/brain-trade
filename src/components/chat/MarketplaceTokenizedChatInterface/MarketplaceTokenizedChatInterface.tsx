@@ -65,6 +65,7 @@ export function MarketplaceTokenizedChatInterface({
     error,
     sendTokenizedMessage,
     startTokenizedConsultation,
+    loadTokenBalance,
   } = useTokenizedChat();
 
   // Blockchain hooks
@@ -95,6 +96,29 @@ export function MarketplaceTokenizedChatInterface({
   const marketplaceBalance = getBalance(expertInfo?.symbol || '');
   const balanceLoaded = isLoaded(expertInfo?.symbol || '');
 
+  // Calculate if user can afford consultation locally
+  const canAffordMarketplaceConsultation = marketplaceBalance && expertInfo 
+    ? marketplaceBalance.balance >= BigInt(expertInfo.tokensPerQuery)
+    : false;
+
+  // Debug info
+  console.log('💰 Marketplace balance debug:', {
+    expertSymbol: expertInfo?.symbol,
+    marketplaceBalance: marketplaceBalance?.balance?.toString(),
+    tokensPerQuery: expertInfo?.tokensPerQuery,
+    canAffordConsultation,
+    canAffordMarketplaceConsultation,
+    balanceLoaded
+  });
+
+  // Debug session info
+  console.log('💬 Session debug:', {
+    currentSession: currentSession?.id,
+    messagesCount: currentSession?.messages.length || 0,
+    hasStartedChat,
+    processingConsultation
+  });
+
   // Load experts on initialization (only once)
   useEffect(() => {
     if (isReady && experts.length === 0 && !loading) {
@@ -104,7 +128,7 @@ export function MarketplaceTokenizedChatInterface({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady, experts.length, loading]);
 
-  // Load balance when expert changes using useTokenBalances like main page
+  // Load balance when expert changes using both hooks
   useEffect(() => {
     if (expertInfo && contractsReady && experts.length > 0) {
       const blockchainExpert = experts.find(e => e.symbol === expertInfo.symbol);
@@ -115,7 +139,12 @@ export function MarketplaceTokenizedChatInterface({
           expertInfo.symbol,
         );
         setBalanceLoading(true);
+        
+        // Load balance for useTokenBalances (for UI display)
         loadBalance(blockchainExpert).finally(() => setBalanceLoading(false));
+        
+        // Load balance for useTokenizedChat (for canAffordConsultation)
+        loadTokenBalance(blockchainExpert);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -142,9 +171,21 @@ export function MarketplaceTokenizedChatInterface({
         console.warn('⚠️ Cannot send marketplace message:', {
           hasExpert: !!expertInfo,
           canAfford: canAffordConsultation,
+          marketplaceBalance: marketplaceBalance?.balance?.toString(),
+          tokensPerQuery: expertInfo?.tokensPerQuery,
         });
         return;
       }
+
+      // Debug expert info being passed to tokenized chat
+      console.log('🔍 Expert info being passed to startTokenizedConsultation:', {
+        name: expertInfo.name,
+        symbol: expertInfo.symbol,
+        tokenAddress: expertInfo.tokenAddress,
+        tokensPerQuery: expertInfo.tokensPerQuery,
+        blockchainExpert: blockchainExpert,
+        availableExperts: experts.map(e => ({symbol: e.symbol, tokenAddress: e.tokenAddress}))
+      });
 
       console.log('📤 Sending marketplace tokenized message:', {
         content: content.substring(0, 50) + '...',
@@ -154,17 +195,23 @@ export function MarketplaceTokenizedChatInterface({
         messagesCount: currentSession?.messages.length || 0,
       });
 
+      // Ensure we have blockchain expert with proper tokenAddress
+      if (!blockchainExpert) {
+        console.error('❌ No blockchain expert found for:', expertInfo.symbol);
+        return;
+      }
+
       try {
         if (!hasStartedChat) {
           console.log('🚀 Starting new marketplace consultation...');
-          // First message - start consultation
-          await startTokenizedConsultation(expertInfo, content);
+          // First message - start consultation with blockchain expert
+          await startTokenizedConsultation(blockchainExpert, content);
           setHasStartedChat(true);
           console.log('✅ Marketplace consultation started successfully');
         } else {
           console.log('💬 Sending subsequent marketplace message...');
-          // Subsequent messages
-          await sendTokenizedMessage(content, expertInfo);
+          // Subsequent messages with blockchain expert
+          await sendTokenizedMessage(content, blockchainExpert);
           console.log('✅ Marketplace message sent successfully');
         }
       } catch (err) {
@@ -173,11 +220,14 @@ export function MarketplaceTokenizedChatInterface({
     },
     [
       expertInfo,
+      blockchainExpert,
       canAffordConsultation,
+      marketplaceBalance,
       hasStartedChat,
       currentSession,
       startTokenizedConsultation,
       sendTokenizedMessage,
+      experts,
     ],
   );
 
@@ -390,10 +440,10 @@ export function MarketplaceTokenizedChatInterface({
       )}
 
       {/* Chat messages display */}
-      {currentSession && currentSession.messages.length > 0 && (
-        <div className={styles.messagesContainer}>
-          <Card className={styles.messagesCard}>
-            <h4>Chat History ({currentSession.messages.length} messages)</h4>
+      <div className={styles.messagesContainer}>
+        <Card className={styles.messagesCard}>
+          <h4>Chat History ({currentSession?.messages.length || 0} messages)</h4>
+          {currentSession && currentSession.messages.length > 0 ? (
             <div className={styles.messagesList}>
               {currentSession.messages.map((message, index) => (
                 <div key={message.id} className={`${styles.message} ${styles[message.type]}`}>
@@ -420,7 +470,6 @@ export function MarketplaceTokenizedChatInterface({
                         )}
                         {message.metadata.transactionHash && (
                           <div className={styles.transactionLink}>
-                            💰 Paid with:{' '}
                             <TransactionLink
                               hash={message.metadata.transactionHash}
                               size="sm"
@@ -434,55 +483,38 @@ export function MarketplaceTokenizedChatInterface({
                 </div>
               ))}
             </div>
-          </Card>
-        </div>
-      )}
-
-      {/* Chat interface */}
-      <div className={styles.chatContainer}>
-        <SimpleMessageInput
-          onSendMessage={handleTokenizedMessage}
-          disabled={!canAffordConsultation || processingConsultation}
-          loading={processingConsultation}
-          placeholder={
-            !canAffordConsultation
-              ? 'Insufficient tokens for consultation'
-              : processingConsultation
-                ? 'Consultation in progress...'
-                : `Write your question to ${expertInfo.name}...`
-          }
-        />
+          ) : (
+            <div style={{ padding: '20px', textAlign: 'center', color: '#6b7280' }}>
+              {hasStartedChat ? 'Loading messages...' : 'No messages yet. Start a conversation!'}
+            </div>
+          )}
+        </Card>
       </div>
 
-      {/* Consultation status */}
-      {processingConsultation && (
-        <div className={styles.consultationStatus}>
-          <div className={styles.processingIndicator}>
-            <div className={styles.spinner} />
-            <span>Tokens deducted. Waiting for expert response...</span>
-          </div>
+      {/* Chat interface */}
+      <div className={styles.chatSection}>
+        <div className={styles.chatHeader}>
+          <h3>Ask {expertInfo.name}</h3>
         </div>
-      )}
+        <div className={styles.chatContainer}>
+          <SimpleMessageInput
+            onSendMessage={handleTokenizedMessage}
+            disabled={!canAffordConsultation || processingConsultation || !balanceLoaded}
+            loading={processingConsultation}
+            placeholder={
+              !balanceLoaded
+                ? 'Loading balance...'
+                : !canAffordConsultation
+                  ? 'Insufficient tokens for consultation'
+                  : processingConsultation
+                    ? 'Tokens deducted. Waiting for expert response...'
+                    : `Ask ${expertInfo.name} anything about investments...`
+            }
+          />
+        </div>
+      </div>
 
-      {/* Consultation information */}
-      {consultationSession && (
-        <div className={styles.consultationInfo}>
-          <Card className={styles.infoCard}>
-            <h4>Active consultation</h4>
-            <p>ID: {consultationSession.id}</p>
-            <p>
-              Cost:{' '}
-              <ConsultationCost
-                cost={BigInt(expertInfo.tokensPerQuery)}
-                symbol={expertInfo.symbol}
-                isWeiFormat={true}
-                size="medium"
-              />
-            </p>
-            <p>Status: {consultationSession.status}</p>
-          </Card>
-        </div>
-      )}
+
 
       {/* Errors */}
       {error && (

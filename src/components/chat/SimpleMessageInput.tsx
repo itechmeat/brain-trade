@@ -66,17 +66,19 @@ export function SimpleMessageInput({
           disabled={isDisabled}
           className={styles.textarea}
         />
-        <Button
-          onClick={handleSend}
-          disabled={!message.trim() || isDisabled}
-          loading={sending}
-          className={styles.sendButton}
-        >
-          Send
-        </Button>
-      </div>
-      <div className={styles.hint}>
-        {isDisabled ? (loading ? 'Processing...' : 'Unavailable') : 'Press Cmd+Enter to send'}
+        <div className={styles.rightSection}>
+          <div className={styles.hint}>
+            {isDisabled ? (loading ? 'Processing...' : 'Unavailable') : 'Press Cmd+Enter to send'}
+          </div>
+          <Button
+            onClick={handleSend}
+            disabled={!message.trim() || isDisabled}
+            loading={sending}
+            className={styles.sendButton}
+          >
+            Send
+          </Button>
+        </div>
       </div>
     </div>
   );
