@@ -78,6 +78,20 @@
     color: var(--text-secondary);
     font-size: 14px;
   }
+
+  .fund {
+    margin: 0 0 8px 0;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .description {
+    margin: 0 0 12px 0;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.4;
+  }
 }
 
 .status {

@@ -25,7 +25,6 @@ interface TokenizedChatState {
 export function useTokenizedChat() {
   const {
     currentSession,
-    sendMessage: baseSendMessage,
     startNewChat,
     loadSession,
     clearSession,
@@ -129,6 +128,32 @@ export function useTokenizedChat() {
         const expertSlug = getSlugFromExpertInfo(expert);
         const chatSession = await startNewChat(initialMessage, expertSlug, true);
 
+        // Send the initial message to get expert response
+        const response = await fetch(`/api/chats/${chatSession.id}/messages`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            content: initialMessage,
+            type: 'user',
+            expertSymbol: expert.symbol,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to get expert response');
+        }
+
+        const responseData = await response.json();
+        if (!responseData.success) {
+          throw new Error(responseData.error || 'Expert response failed');
+        }
+
+        // API добавляет и пользовательское сообщение и ответ эксперта
+        // Reload session to get updated messages from server
+        await loadSession(chatSession.id);
+
         // Update state
         setTokenizedState(prev => ({
           ...prev,
@@ -154,6 +179,7 @@ export function useTokenizedChat() {
       startConsultation,
       startNewChat,
       loadTokenBalance,
+      loadSession,
     ],
   );
 
@@ -185,9 +211,30 @@ export function useTokenizedChat() {
           throw new Error(tokenResult.error || 'Failed to start consultation');
         }
 
-        // Send message to chat (use slug for API)
-        const expertSlug = getSlugFromExpertInfo(expert);
-        await baseSendMessage(content, expertSlug);
+        // Send message to chat directly (like regular chat)
+        const response = await fetch(`/api/chats/${currentSession.id}/messages`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            content,
+            type: 'user',
+            expertSymbol: expert.symbol,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to get expert response');
+        }
+
+        const responseData = await response.json();
+        if (!responseData.success) {
+          throw new Error(responseData.error || 'Expert response failed');
+        }
+
+        // Reload session to get updated messages from server
+        await loadSession(currentSession.id);
 
         // Update consultation state
         setTokenizedState(prev => ({
@@ -219,8 +266,8 @@ export function useTokenizedChat() {
       currentSession,
       tokenizedState.canAffordConsultation,
       startConsultation,
-      baseSendMessage,
       loadTokenBalance,
+      loadSession,
     ],
   );
 

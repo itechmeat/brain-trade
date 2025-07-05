@@ -11,6 +11,7 @@ import { useTokenBalances } from '@/hooks/useTokenBalances';
 import { ExpertInfo } from '@/types/contracts';
 import { Card, Button, TokenBalance, ConsultationCost } from '@/components/ui';
 import { SimpleExpertAvatar } from './SimpleExpertAvatar';
+import { getExpertMetadata } from '@/lib/expert-metadata';
 import styles from './ExpertSelector.module.scss';
 
 interface ExpertSelectorProps {
@@ -106,6 +107,7 @@ export function ExpertSelector({
           const balance = getBalance(expert.symbol);
           const balanceLoaded = isLoaded(expert.symbol);
           const isSelected = selectedExpert?.symbol === expert.symbol;
+          const metadata = getExpertMetadata(expert.symbol);
 
           return (
             <div key={expert.symbol} className={styles.expertCardWrapper}>
@@ -123,6 +125,10 @@ export function ExpertSelector({
                   <div className={styles.expertInfo}>
                     <h4>{expert.name}</h4>
                     <p className={styles.category}>{expert.category}</p>
+                    {metadata?.fund && <p className={styles.fund}>{metadata.fund}</p>}
+                    {metadata?.description && (
+                      <p className={styles.description}>{metadata.description}</p>
+                    )}
                     <div className={styles.status}>
                       <span
                         className={`${styles.statusDot} ${expert.isActive ? styles.active : styles.inactive}`}
