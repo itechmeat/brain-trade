@@ -1,23 +1,10 @@
-import type { Metadata } from 'next';
+import { Metadata } from 'next';
 
-interface ChatLayoutProps {
-  children: React.ReactNode;
-  params: Promise<{ expert: string; id: string }>;
-}
+export const metadata: Metadata = {
+  title: 'Expert Chat - BrainTrade',
+  description: 'Chat with blockchain investment experts',
+};
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ expert: string; id: string }>;
-}): Promise<Metadata> {
-  const { expert } = await params;
-  // You could fetch expert data here for dynamic metadata
-  return {
-    title: `Expert Chat - BrainTrade`,
-    description: `Personal consultation with expert ${expert}`,
-  };
-}
-
-export default function ChatLayout({ children }: ChatLayoutProps) {
+export default function MarketplaceChatLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
