@@ -21,7 +21,26 @@ contract ExpertToken is ERC20, Ownable {
     // Expert info
     string public expertName;          // Human-readable name (e.g. "Peter Thiel")
     string public expertCategory;      // Category (e.g. "Venture Capital")
-    uint256 public consultationCost;   // Cost per consultation in tokens
+    
+    /**
+     * @dev CRITICAL: consultationCost is stored in WEI format (with 18 decimals)
+     * 
+     * WHY WEI FORMAT IS ESSENTIAL:
+     * - ERC-20 tokens work in wei format: 1 token = 1 * 10^18 wei
+     * - When users buy tokens, they get tokens in wei format 
+     * - When we deduct for consultation, we must deduct in wei format
+     * - If consultationCost = 15, it deducts 15 wei = 0.000000000000000015 tokens (WRONG!)
+     * - If consultationCost = 15 * 10^18, it deducts 15 full tokens (CORRECT!)
+     * 
+     * DEPLOYMENT REQUIREMENT:
+     * - MUST use ethers.parseEther('15') when creating experts
+     * - NEVER pass raw numbers like 15, 20, 10
+     * 
+     * UI REQUIREMENT:
+     * - MUST use isWeiFormat=true in ConsultationCost components
+     * - This converts wei back to readable format for display
+     */
+    uint256 public consultationCost;   // Cost per consultation in WEI format (15 * 10^18 for 15 tokens)
     address public expertAddress;      // Expert's wallet for revenue
     
     // Platform settings
@@ -37,6 +56,7 @@ contract ExpertToken is ERC20, Ownable {
     event ConsultationStarted(address indexed user, uint256 tokenAmount, uint256 consultationId);
     event ConsultationCompleted(address indexed user, uint256 consultationId);
     event RevenueDistributed(address indexed expert, uint256 expertAmount, uint256 platformAmount);
+    event TipSent(address indexed from, address indexed to, uint256 amount);
     
     /**
      * @dev Initialize expert token with basic info
@@ -44,7 +64,8 @@ contract ExpertToken is ERC20, Ownable {
      * @param _symbol Token symbol (e.g. "btTHIEL") 
      * @param _expertName Human readable expert name
      * @param _expertCategory Expert category
-     * @param _tokensPerQuery Cost per query in expert tokens (from JSON config)
+     * @param _tokensPerQuery CRITICAL: Cost per query in WEI format! 
+     *                       Must be ethers.parseEther('15') for 15 tokens, NOT raw 15!
      * @param _expertAddress Expert's wallet address
      * @param _platformAddress Platform's wallet address
      */
@@ -86,6 +107,12 @@ contract ExpertToken is ERC20, Ownable {
     
     /**
      * @dev Start consultation - spend tokens for AI chat access
+     * 
+     * CRITICAL: This function deducts consultationCost (in wei format) from user balance
+     * - consultationCost is stored as 15 * 10^18 for 15 tokens
+     * - User balance is also in wei format when they buy tokens
+     * - This ensures correct deduction: 15 full tokens, not 15 wei
+     * 
      * @param _consultationId Unique ID for this consultation session
      * @return success Whether consultation was started successfully
      */
@@ -93,6 +120,7 @@ contract ExpertToken is ERC20, Ownable {
         require(balanceOf(msg.sender) >= consultationCost, "Insufficient token balance");
         
         // Transfer tokens from user back to contract (temporary hold)
+        // consultationCost is in wei format, so this deducts the correct amount
         _transfer(msg.sender, address(this), consultationCost);
         
         totalConsultations++;
@@ -162,5 +190,19 @@ contract ExpertToken is ERC20, Ownable {
      */
     function canAffordConsultation(address _user) external view returns (bool) {
         return balanceOf(_user) >= consultationCost;
+    }
+    
+    /**
+     * @dev Send tip to expert
+     * @param _amount Amount of tokens to send as tip
+     */
+    function sendTip(uint256 _amount) external {
+        require(_amount > 0, "Tip amount must be greater than 0");
+        require(balanceOf(msg.sender) >= _amount, "Insufficient balance for tip");
+        
+        // Transfer tokens directly to expert
+        _transfer(msg.sender, expertAddress, _amount);
+        
+        emit TipSent(msg.sender, expertAddress, _amount);
     }
 }

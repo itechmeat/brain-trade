@@ -11,7 +11,15 @@ import { useContracts } from '@/hooks/useContracts';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { ExpertInfo } from '@/types/contracts';
 import { SimpleMessageInput } from './SimpleMessageInput';
-import { Button, Card, Dialog, TokenBalance, ConsultationCost } from '@/components/ui';
+import {
+  Button,
+  Card,
+  Dialog,
+  TokenBalance,
+  ConsultationCost,
+  TipButton,
+  TransactionLink,
+} from '@/components/ui';
 import { TokenPurchase } from '@/components/blockchain/TokenPurchase';
 import styles from './TokenizedChatInterface.module.scss';
 import { SimpleExpertAvatar } from '@/components/experts/SimpleExpertAvatar';
@@ -95,26 +103,43 @@ export function TokenizedChatInterface({
   const handleTokenizedMessage = useCallback(
     async (content: string) => {
       if (!selectedExpert || !canAffordConsultation) {
+        console.warn('⚠️ Cannot send message:', {
+          hasExpert: !!selectedExpert,
+          canAfford: canAffordConsultation,
+        });
         return;
       }
 
+      console.log('📤 Sending tokenized message:', {
+        content: content.substring(0, 50) + '...',
+        expert: selectedExpert.name,
+        hasStartedChat,
+        currentSessionId: currentSession?.id,
+        messagesCount: currentSession?.messages.length || 0,
+      });
+
       try {
         if (!hasStartedChat) {
+          console.log('🚀 Starting new tokenized consultation...');
           // First message - start consultation
           await startTokenizedConsultation(selectedExpert, content);
           setHasStartedChat(true);
+          console.log('✅ Consultation started successfully');
         } else {
+          console.log('💬 Sending subsequent message...');
           // Subsequent messages
           await sendTokenizedMessage(content, selectedExpert);
+          console.log('✅ Message sent successfully');
         }
       } catch (err) {
-        console.error('Tokenized message failed:', err);
+        console.error('❌ Tokenized message failed:', err);
       }
     },
     [
       selectedExpert,
       canAffordConsultation,
       hasStartedChat,
+      currentSession,
       startTokenizedConsultation,
       sendTokenizedMessage,
     ],
@@ -262,6 +287,20 @@ export function TokenizedChatInterface({
               <Button size="sm" variant="outline" onClick={() => setShowPurchaseModal(true)}>
                 Buy tokens
               </Button>
+
+              {/* Tips button - always visible */}
+              {selectedExpert && (
+                <TipButton
+                  expert={selectedExpert}
+                  tokenBalance={tokenBalance}
+                  onTipSent={() => {
+                    // Reload balance after tip is sent
+                    loadTokenBalance(selectedExpert, true);
+                  }}
+                  disabled={processingConsultation || balanceLoading}
+                />
+              )}
+
               {!canAffordConsultation && tokenBalance && (
                 <span className={styles.insufficientWarning}>
                   Insufficient tokens for consultation
@@ -275,16 +314,47 @@ export function TokenizedChatInterface({
       {/* Debug info */}
       {currentSession && (
         <div
-          style={{ padding: '10px', background: '#f0f0f0', marginBottom: '10px', fontSize: '12px' }}
+          style={{
+            padding: '10px',
+            background: '#f0f0f0',
+            marginBottom: '10px',
+            fontSize: '12px',
+            fontFamily: 'monospace',
+            borderRadius: '4px',
+            border: '1px solid #ddd',
+          }}
         >
-          <div>Session ID: {currentSession.id}</div>
-          <div>Messages count: {currentSession.messages.length}</div>
-          <div>Session status: {currentSession.status}</div>
           <div>
-            Last message:{' '}
-            {currentSession.messages[currentSession.messages.length - 1]?.content.substring(0, 50)}
-            ...
+            <strong>🔍 SESSION DEBUG INFO:</strong>
           </div>
+          <div>📋 Session ID: {currentSession.id}</div>
+          <div>💬 Messages count: {currentSession.messages.length}</div>
+          <div>📊 Session status: {currentSession.status}</div>
+          <div>🎯 Expert ID: {currentSession.expertId}</div>
+          <div>🌐 Language: {currentSession.language}</div>
+          <div>💭 Original idea: {currentSession.originalIdea?.substring(0, 50)}...</div>
+          {consultationSession && (
+            <div>
+              💰 Current consultation: {consultationSession.status} |{' '}
+              {consultationSession.transactionHash && (
+                <TransactionLink
+                  hash={consultationSession.transactionHash}
+                  size="sm"
+                  text="View TX"
+                />
+              )}
+            </div>
+          )}
+          {currentSession.messages.length > 0 && (
+            <div>
+              🕐 Last message:{' '}
+              {currentSession.messages[currentSession.messages.length - 1]?.content.substring(
+                0,
+                50,
+              )}
+              ... ({currentSession.messages[currentSession.messages.length - 1]?.type})
+            </div>
+          )}
         </div>
       )}
 
@@ -292,19 +362,51 @@ export function TokenizedChatInterface({
       {currentSession && currentSession.messages.length > 0 && (
         <div className={styles.messagesContainer}>
           <Card className={styles.messagesCard}>
-            <h4>Chat History</h4>
+            <h4>Chat History ({currentSession.messages.length} messages)</h4>
             <div className={styles.messagesList}>
-              {currentSession.messages.map(message => (
+              {currentSession.messages.map((message, index) => (
                 <div key={message.id} className={`${styles.message} ${styles[message.type]}`}>
                   <div className={styles.messageHeader}>
                     <span className={styles.messageAuthor}>
-                      {message.type === 'user' ? 'You' : selectedExpert.name}
+                      #{index + 1} - {message.type === 'user' ? 'You' : selectedExpert.name}
                     </span>
                     <span className={styles.messageTime}>
                       {message.timestamp.toLocaleTimeString()}
                     </span>
                   </div>
-                  <div className={styles.messageContent}>{message.content}</div>
+                  <div className={styles.messageContent}>
+                    {message.content}
+                    {message.metadata && (
+                      <div
+                        style={{
+                          fontSize: '10px',
+                          color: '#666',
+                          marginTop: '5px',
+                          fontFamily: 'monospace',
+                        }}
+                      >
+                        {message.metadata.processingTime && (
+                          <span>⏱️ {message.metadata.processingTime}ms</span>
+                        )}
+                        {message.metadata.ragMetadata && (
+                          <span>
+                            {' '}
+                            | 🧠 RAG: {message.metadata.ragMetadata.contextChunks} chunks
+                          </span>
+                        )}
+                        {message.metadata.transactionHash && (
+                          <div style={{ marginTop: '4px' }}>
+                            💰 Paid with:{' '}
+                            <TransactionLink
+                              hash={message.metadata.transactionHash}
+                              size="sm"
+                              text="View Transaction"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

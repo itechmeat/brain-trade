@@ -14,6 +14,12 @@ export interface MessageMetadata {
   reasoning?: string;
   sources?: string[];
   processingTime?: number;
+  transactionHash?: string;
+  ragMetadata?: {
+    contextChunks: number;
+    totalTokens: number;
+    processingTime: number;
+  };
 }
 
 export interface ChatSession {

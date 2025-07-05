@@ -26,11 +26,10 @@ export const messageCreateSchema = z.object({
   content: z.string().min(1, 'Message content cannot be empty'),
   type: z.enum(['user', 'expert', 'system']).default('user'),
   expertId: z.string().optional(),
-  expertSymbol: z.string().optional(), // For tokenized chat support
+  expertSymbol: z.string().optional(),
   selectedModel: z.string().optional(),
+  transactionHash: z.string().optional(),
 });
-
-
 
 // Expert related schemas
 export const expertRequestSchema = z.object({

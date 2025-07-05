@@ -126,9 +126,11 @@ export function useTokenizedChat() {
 
         // Create chat session (use slug for API compatibility)
         const expertSlug = getSlugFromExpertInfo(expert);
+
+        // Create empty session first - startNewChat only creates session, doesn't send messages
         const chatSession = await startNewChat(initialMessage, expertSlug, true);
 
-        // Send the initial message to get expert response
+        // Now send the initial message to get expert response
         const response = await fetch(`/api/chats/${chatSession.id}/messages`, {
           method: 'POST',
           headers: {
@@ -138,6 +140,7 @@ export function useTokenizedChat() {
             content: initialMessage,
             type: 'user',
             expertSymbol: expert.symbol,
+            transactionHash: tokenResult.transaction?.hash,
           }),
         });
 
@@ -150,8 +153,7 @@ export function useTokenizedChat() {
           throw new Error(responseData.error || 'Expert response failed');
         }
 
-        // API добавляет и пользовательское сообщение и ответ эксперта
-        // Reload session to get updated messages from server
+        // Load the session to get the updated messages from server
         await loadSession(chatSession.id);
 
         // Update state
@@ -221,6 +223,7 @@ export function useTokenizedChat() {
             content,
             type: 'user',
             expertSymbol: expert.symbol,
+            transactionHash: tokenResult.transaction?.hash,
           }),
         });
 

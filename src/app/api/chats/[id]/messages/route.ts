@@ -57,25 +57,45 @@ function addMessageToSession(sessionId: string, message: ChatMessage): void {
 /**
  * Formats chat history for prompts
  * @param messages - Array of chat messages
+ * @param currentUserMessage - Current user message being processed (optional)
  * @returns Formatted chat history string
  */
-function formatChatHistory(messages: ChatMessage[]): string {
-  if (messages.length === 0) {
+function formatChatHistory(messages: ChatMessage[], currentUserMessage?: string): string {
+  if (messages.length === 0 && !currentUserMessage) {
     return 'No previous messages in this conversation.';
   }
 
-  return messages
-    .map(msg => {
-      const speaker =
-        msg.type === 'user'
-          ? 'USER'
-          : msg.type === 'expert'
-            ? `EXPERT (${msg.expertId})`
-            : 'SYSTEM';
-      const timestamp = msg.timestamp.toISOString();
-      return `[${timestamp}] ${speaker}: ${msg.content}`;
-    })
-    .join('\n');
+  let history = '';
+
+  // Add previous messages
+  if (messages.length > 0) {
+    history = messages
+      .map(msg => {
+        const speaker =
+          msg.type === 'user'
+            ? 'USER'
+            : msg.type === 'expert'
+              ? `EXPERT (${msg.expertId})`
+              : 'SYSTEM';
+        const timestamp = msg.timestamp.toISOString();
+        return `[${timestamp}] ${speaker}: ${msg.content}`;
+      })
+      .join('\n');
+  }
+
+  // Add current user message if provided
+  if (currentUserMessage) {
+    const timestamp = new Date().toISOString();
+    const currentMessageLine = `[${timestamp}] USER: ${currentUserMessage}`;
+
+    if (history) {
+      history += '\n' + currentMessageLine;
+    } else {
+      history = currentMessageLine;
+    }
+  }
+
+  return history;
 }
 
 /**
@@ -86,12 +106,12 @@ function formatChatHistory(messages: ChatMessage[]): string {
 function getExpertBySlug(expertIdentifier: string): InvestmentExpert {
   // First try to find by slug
   let expert = investmentExperts.find(e => e.slug === expertIdentifier) as InvestmentExpert;
-  
+
   // If not found, try to find by token symbol
   if (!expert) {
     expert = investmentExperts.find(e => e.token === expertIdentifier) as InvestmentExpert;
   }
-  
+
   if (!expert) {
     throw new Error(`Expert with identifier "${expertIdentifier}" not found`);
   }
@@ -311,7 +331,7 @@ export const POST = createAPIHandlerWithParams(async (request: NextRequest, para
   const { id: sessionId } = params;
   const body = await request.json();
   const validatedData = ValidationSchemas.message.create.parse(body);
-  const { content, type, expertId, expertSymbol, selectedModel } = validatedData;
+  const { content, type, expertId, expertSymbol, selectedModel, transactionHash } = validatedData;
 
   const session = getChatSession(sessionId);
   if (!session) {
@@ -319,17 +339,39 @@ export const POST = createAPIHandlerWithParams(async (request: NextRequest, para
   }
 
   if (type === 'user') {
-    // Add user message to session
+    // IMPORTANT: Format chat history BEFORE adding new user message
+    // This prevents duplication of the current message in the context
+    const chatHistory = formatChatHistory(session.messages, content);
+
+    // Create user message with transaction hash if provided (for tokenized chat)
     const userMessage = createUserMessage(sessionId, content, type, expertId);
+    if (transactionHash) {
+      userMessage.metadata = {
+        ...userMessage.metadata,
+        transactionHash,
+      };
+    }
+
+    // Add user message to session
     addMessageToSession(sessionId, userMessage);
 
     // Generate expert response directly (1:1 chat with single expert)
     // Use expertSymbol if provided (for tokenized chat), otherwise use session.expertId
     const targetExpertId = expertSymbol || session.expertId;
     const expert = getExpertBySlug(targetExpertId);
-    const chatHistory = formatChatHistory(session.messages);
 
-    console.log(`Generating expert response for: ${targetExpertId}`);
+    console.log(`🔍 CHAT HISTORY DEBUG for ${targetExpertId}:`);
+    console.log(`📝 Session messages count BEFORE adding user message: ${session.messages.length}`);
+    console.log(`💬 Current user message: "${content}"`);
+    console.log(`📜 Chat history being sent to expert (${chatHistory.length} chars):`);
+    console.log(chatHistory);
+    console.log(
+      `📊 Session messages count AFTER adding user message: ${session.messages.length + 1}`,
+    );
+    console.log(`🎯 Target expert: ${targetExpertId}`);
+    if (transactionHash) {
+      console.log(`💰 Transaction hash: ${transactionHash}`);
+    }
 
     try {
       const expertResponse = await generateExpertResponse(
@@ -345,12 +387,15 @@ export const POST = createAPIHandlerWithParams(async (request: NextRequest, para
       // Add expert response to session
       addMessageToSession(sessionId, expertMessage);
 
+      console.log(`✅ Expert response generated successfully`);
+      console.log(`💬 Expert response preview: "${expertResponse.message.substring(0, 100)}..."`);
+
       return {
         userMessage,
         expertMessage,
       };
     } catch (error) {
-      console.error(`Failed to generate response for expert ${targetExpertId}:`, error);
+      console.error(`❌ Failed to generate response for expert ${targetExpertId}:`, error);
 
       const fallbackMessage = createFallbackMessage(
         sessionId,
@@ -370,7 +415,7 @@ export const POST = createAPIHandlerWithParams(async (request: NextRequest, para
   if (type === 'expert' && expertId) {
     // Generate response for single expert (for queue processing)
     const expert = getExpertBySlug(expertId);
-    const chatHistory = formatChatHistory(session.messages);
+    const chatHistory = formatChatHistory(session.messages, content);
     console.log(`Generating single expert response for: ${expertId}`);
 
     try {
@@ -391,7 +436,7 @@ export const POST = createAPIHandlerWithParams(async (request: NextRequest, para
         message: expertMessage,
       };
     } catch (error) {
-      console.error(`Failed to generate response for expert ${expertId}:`, error);
+      console.error(`❌ Failed to generate response for expert ${expertId}:`, error);
 
       const fallbackMessage = createFallbackMessage(
         sessionId,
