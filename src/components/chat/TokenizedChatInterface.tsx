@@ -39,8 +39,7 @@ export function TokenizedChatInterface({
 }: TokenizedChatInterfaceProps) {
   // Tokenized chat hook
   const {
-    // currentSession - will be used later for history display
-    // messages - will be used in ChatInterface
+    currentSession,
     tokenBalance,
     canAffordConsultation,
     processingConsultation,
@@ -272,6 +271,46 @@ export function TokenizedChatInterface({
           </div>
         </Card>
       </div>
+
+      {/* Debug info */}
+      {currentSession && (
+        <div
+          style={{ padding: '10px', background: '#f0f0f0', marginBottom: '10px', fontSize: '12px' }}
+        >
+          <div>Session ID: {currentSession.id}</div>
+          <div>Messages count: {currentSession.messages.length}</div>
+          <div>Session status: {currentSession.status}</div>
+          <div>
+            Last message:{' '}
+            {currentSession.messages[currentSession.messages.length - 1]?.content.substring(0, 50)}
+            ...
+          </div>
+        </div>
+      )}
+
+      {/* Chat messages display */}
+      {currentSession && currentSession.messages.length > 0 && (
+        <div className={styles.messagesContainer}>
+          <Card className={styles.messagesCard}>
+            <h4>Chat History</h4>
+            <div className={styles.messagesList}>
+              {currentSession.messages.map(message => (
+                <div key={message.id} className={`${styles.message} ${styles[message.type]}`}>
+                  <div className={styles.messageHeader}>
+                    <span className={styles.messageAuthor}>
+                      {message.type === 'user' ? 'You' : selectedExpert.name}
+                    </span>
+                    <span className={styles.messageTime}>
+                      {message.timestamp.toLocaleTimeString()}
+                    </span>
+                  </div>
+                  <div className={styles.messageContent}>{message.content}</div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* Chat interface */}
       <div className={styles.chatContainer}>

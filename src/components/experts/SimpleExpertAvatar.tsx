@@ -5,7 +5,9 @@
  */
 
 import React from 'react';
+import Image from 'next/image';
 import { ExpertInfo } from '@/types/contracts';
+import { getExpertMetadata } from '@/lib/expert-metadata';
 import styles from './SimpleExpertAvatar.module.scss';
 
 interface SimpleExpertAvatarProps {
@@ -14,6 +16,9 @@ interface SimpleExpertAvatarProps {
 }
 
 export function SimpleExpertAvatar({ expert, size = 'medium' }: SimpleExpertAvatarProps) {
+  // Get expert metadata for photo
+  const metadata = getExpertMetadata(expert.symbol);
+
   // Generate initials from name
   const initials = expert.name
     .split(' ')
@@ -50,7 +55,23 @@ export function SimpleExpertAvatar({ expert, size = 'medium' }: SimpleExpertAvat
 
   return (
     <div className={`${styles.avatar} ${styles[size]}`} style={{ backgroundColor }}>
-      <span className={styles.initials}>{initials}</span>
+      {metadata?.photo ? (
+        <Image
+          src={metadata.photo}
+          alt={expert.name}
+          fill
+          className={styles.photo}
+          onError={e => {
+            // Fallback to initials if image fails to load
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+            target.nextElementSibling?.removeAttribute('style');
+          }}
+        />
+      ) : null}
+      <span className={`${styles.initials} ${metadata?.photo ? styles.hidden : ''}`}>
+        {initials}
+      </span>
     </div>
   );
 }
