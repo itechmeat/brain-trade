@@ -1,0 +1,52 @@
+/**
+ * Styles for simple message input component
+ */
+
+.messageInput {
+  background: var(--surface-primary);
+  border-radius: 12px;
+  border: 1px solid var(--border-primary);
+  padding: 16px;
+}
+
+.inputWrapper {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.textarea {
+  flex: 1;
+  resize: vertical;
+  min-height: 80px;
+  max-height: 200px;
+}
+
+.sendButton {
+  flex-shrink: 0;
+  align-self: flex-end;
+}
+
+.hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+// Responsiveness
+@media (max-width: 768px) {
+  .messageInput {
+    padding: 12px;
+  }
+
+  .inputWrapper {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .textarea {
+    min-height: 60px;
+  }
+}

@@ -13,10 +13,20 @@ export const chatCreateSchema = z.object({
   id: z.string().optional(),
 });
 
+// Tokenized chat schema (more flexible for initial messages)
+export const tokenizedChatCreateSchema = z.object({
+  originalIdea: z.string().min(1, 'Message cannot be empty'),
+  expertId: z.string().min(1, 'Expert ID is required'),
+  language: z.string().optional(),
+  id: z.string().optional(),
+  isTokenized: z.boolean().default(true),
+});
+
 export const messageCreateSchema = z.object({
   content: z.string().min(1, 'Message content cannot be empty'),
   type: z.enum(['user', 'expert', 'system']).default('user'),
   expertId: z.string().optional(),
+  expertSymbol: z.string().optional(), // For tokenized chat support
   selectedModel: z.string().optional(),
 });
 
@@ -42,6 +52,7 @@ export const ragAnalysisSchema = z.object({
 export const ValidationSchemas = {
   chat: {
     create: chatCreateSchema,
+    tokenized: tokenizedChatCreateSchema,
   },
   message: {
     create: messageCreateSchema,

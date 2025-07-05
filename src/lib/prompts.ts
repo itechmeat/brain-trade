@@ -303,9 +303,10 @@ export function formatChatHistoryForPrompt(
 ): string {
   return messages
     .map(message => {
-      const timeStr = message.timestamp.toLocaleTimeString('ru-RU', {
+      const timeStr = message.timestamp.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
+        hour12: false,
       });
 
       if (message.type === 'user') {

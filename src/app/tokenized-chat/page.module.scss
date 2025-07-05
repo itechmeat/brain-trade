@@ -1,0 +1,317 @@
+/**
+ * Styles for tokenized chat page
+ */
+
+.tokenizedChatPage {
+  min-height: 100vh;
+  background: var(--background-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding: 40px 20px;
+  background: linear-gradient(135deg, var(--primary-bg), var(--surface-primary));
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 40px;
+}
+
+.headerText {
+  text-align: center;
+  flex: 1;
+
+  h1 {
+    margin: 0 0 16px 0;
+    color: var(--text-primary);
+    font-size: 48px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 18px;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+.walletConnection {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.walletInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+
+  span {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+}
+
+.content {
+  flex: 1;
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.expertSelectionSection {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+
+  .stepNumber {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.5;
+    margin-top: 4px;
+  }
+}
+
+.expertSelectorContainer {
+  // Styles inherited from ExpertSelector component
+}
+
+.chatSection {
+  display: flex;
+  flex-direction: column;
+  height: 80vh;
+  gap: 24px;
+}
+
+.chatHeader {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.backButton {
+  flex-shrink: 0;
+}
+
+.currentExpert {
+  h2 {
+    margin: 0 0 4px 0;
+    color: var(--text-primary);
+    font-size: 28px;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 16px;
+  }
+}
+
+.chatContainer {
+  flex: 1;
+  min-height: 0;
+}
+
+.footer {
+  padding: 40px 20px;
+  background: var(--surface-secondary);
+  border-top: 1px solid var(--border-primary);
+}
+
+.footerCard {
+  padding: 32px;
+  background: var(--surface-primary);
+  border-radius: 16px;
+  border: 1px solid var(--border-primary);
+  max-width: 1200px;
+  margin: 0 auto;
+
+  h4 {
+    margin: 0 0 24px 0;
+    color: var(--text-primary);
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+  }
+}
+
+.benefits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+.benefit {
+  text-align: center;
+
+  h5 {
+    margin: 0 0 8px 0;
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+// Tablet responsiveness
+@media (max-width: 1024px) {
+  .expertSelectionSection {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .infoCard {
+    position: static;
+  }
+
+  .chatSection {
+    height: 70vh;
+  }
+}
+
+// Mobile responsiveness
+@media (max-width: 768px) {
+  .header {
+    padding: 32px 16px;
+  }
+
+  .headerContent {
+    flex-direction: column;
+    gap: 24px;
+    text-align: center;
+  }
+
+  .headerText {
+    h1 {
+      font-size: 36px;
+    }
+
+    .subtitle {
+      font-size: 16px;
+    }
+  }
+
+  .walletConnection {
+    order: -1;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .walletInfo {
+    align-items: center;
+    text-align: center;
+  }
+
+  .content {
+    padding: 24px 16px;
+  }
+
+  .infoCard {
+    padding: 24px;
+  }
+
+  .chatHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .currentExpert h2 {
+    font-size: 24px;
+  }
+
+  .chatSection {
+    height: 60vh;
+  }
+
+  .footer {
+    padding: 24px 16px;
+  }
+
+  .footerCard {
+    padding: 24px;
+  }
+
+  .benefits {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 28px;
+  }
+
+  .steps {
+    gap: 16px;
+  }
+
+  .step {
+    gap: 12px;
+  }
+
+  .step .stepNumber {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .chatSection {
+    height: 50vh;
+  }
+}

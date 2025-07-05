@@ -1,0 +1,257 @@
+/**
+ * Styles for Token Balance Components
+ */
+
+.dashboard {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .header {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--color-text-primary);
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: var(--color-text-secondary);
+    }
+  }
+
+  .loading,
+  .networkError,
+  .noExperts {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: var(--color-surface-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+
+    h2,
+    h3 {
+      margin-bottom: 1rem;
+      color: var(--color-text-primary);
+    }
+
+    p {
+      color: var(--color-text-secondary);
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  .switchButton {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+
+  .tokenGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+}
+
+.tokenBalance {
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border);
+
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin: 0;
+    }
+
+    .balanceDisplay {
+      text-align: right;
+
+      .amount {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--color-accent);
+      }
+
+      .symbol {
+        font-size: 0.9rem;
+        color: var(--color-text-secondary);
+        font-weight: 500;
+      }
+    }
+  }
+
+  .status {
+    margin-bottom: 1.5rem;
+
+    .consultationStatus {
+      .canAfford {
+        color: #22c55e;
+        font-weight: 600;
+      }
+
+      .cannotAfford {
+        color: #ef4444;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .actions {
+    h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin: 0 0 1rem 0;
+    }
+
+    .purchaseOptions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .purchaseButton {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+
+      small {
+        font-size: 0.8rem;
+        opacity: 0.9;
+        font-weight: 400;
+      }
+
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+    }
+  }
+
+  .error {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    color: #dc2626;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--color-text-secondary);
+  }
+}
+
+.tokenCard {
+  // Additional styles for token cards in grid
+  min-height: 300px;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 1rem;
+
+    .tokenGrid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .header {
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  .tokenBalance {
+    padding: 1rem;
+
+    .header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+
+      .balanceDisplay {
+        text-align: left;
+      }
+    }
+
+    .actions {
+      .purchaseButton {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .tokenBalance .error {
+    background: #422006;
+    border-color: #451a03;
+    color: #fbbf24;
+  }
+}
+
+// Note: CSS custom properties should be defined in global styles
+// These variables are used throughout the component styles above

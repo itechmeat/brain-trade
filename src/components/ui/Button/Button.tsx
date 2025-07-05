@@ -7,7 +7,8 @@ export interface ButtonProps {
   children: React.ReactNode;
   className?: string;
   disabled?: boolean;
-  onClick?: () => void;
+  loading?: boolean;
+  onClick?: (event?: React.MouseEvent<HTMLButtonElement>) => void;
   type?: 'button' | 'submit' | 'reset';
 }
 
@@ -17,17 +18,27 @@ export function Button({
   children, 
   className = '',
   disabled = false,
+  loading = false,
   onClick,
   type = 'button'
 }: ButtonProps) {
+  const isDisabled = disabled || loading;
+  
   return (
     <button 
-      className={`${styles.button} ${styles[variant]} ${styles[size]} ${className} ${disabled ? styles.disabled : ''}`}
-      disabled={disabled}
+      className={`${styles.button} ${styles[variant]} ${styles[size]} ${className} ${isDisabled ? styles.disabled : ''} ${loading ? styles.loading : ''}`}
+      disabled={isDisabled}
       onClick={onClick}
       type={type}
     >
-      {children}
+      {loading ? (
+        <span className={styles.loadingContent}>
+          <span className={styles.spinner} />
+          {children}
+        </span>
+      ) : (
+        children
+      )}
     </button>
   );
 }

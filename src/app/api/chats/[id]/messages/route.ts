@@ -79,14 +79,21 @@ function formatChatHistory(messages: ChatMessage[]): string {
 }
 
 /**
- * Gets expert data by slug
- * @param expertSlug - Expert slug
+ * Gets expert data by slug or token symbol
+ * @param expertIdentifier - Expert slug or token symbol (btBEN, btTHIEL, etc.)
  * @returns Expert data
  */
-function getExpertBySlug(expertSlug: string): InvestmentExpert {
-  const expert = investmentExperts.find(e => e.slug === expertSlug) as InvestmentExpert;
+function getExpertBySlug(expertIdentifier: string): InvestmentExpert {
+  // First try to find by slug
+  let expert = investmentExperts.find(e => e.slug === expertIdentifier) as InvestmentExpert;
+  
+  // If not found, try to find by token symbol
   if (!expert) {
-    throw new Error(`Expert with slug "${expertSlug}" not found`);
+    expert = investmentExperts.find(e => e.token === expertIdentifier) as InvestmentExpert;
+  }
+  
+  if (!expert) {
+    throw new Error(`Expert with identifier "${expertIdentifier}" not found`);
   }
   return expert;
 }
@@ -267,7 +274,7 @@ function createFallbackMessage(
   // Provide fallback messages in multiple languages
   const fallbackMessages: Record<string, string> = {
     Russian:
-      'У меня сейчас проблемы с анализом. Не могли бы вы перефразировать вопрос или предоставить больше деталей?',
+      'I am having trouble analyzing this right now. Could you please rephrase your question or provide more details?',
     English:
       "I'm having trouble analyzing this right now. Could you please rephrase your question or provide more details?",
     Spanish:
@@ -304,7 +311,7 @@ export const POST = createAPIHandlerWithParams(async (request: NextRequest, para
   const { id: sessionId } = params;
   const body = await request.json();
   const validatedData = ValidationSchemas.message.create.parse(body);
-  const { content, type, expertId, selectedModel } = validatedData;
+  const { content, type, expertId, expertSymbol, selectedModel } = validatedData;
 
   const session = getChatSession(sessionId);
   if (!session) {
@@ -317,10 +324,12 @@ export const POST = createAPIHandlerWithParams(async (request: NextRequest, para
     addMessageToSession(sessionId, userMessage);
 
     // Generate expert response directly (1:1 chat with single expert)
-    const expert = getExpertBySlug(session.expertId);
+    // Use expertSymbol if provided (for tokenized chat), otherwise use session.expertId
+    const targetExpertId = expertSymbol || session.expertId;
+    const expert = getExpertBySlug(targetExpertId);
     const chatHistory = formatChatHistory(session.messages);
 
-    console.log(`Generating expert response for: ${session.expertId}`);
+    console.log(`Generating expert response for: ${targetExpertId}`);
 
     try {
       const expertResponse = await generateExpertResponse(
@@ -341,7 +350,7 @@ export const POST = createAPIHandlerWithParams(async (request: NextRequest, para
         expertMessage,
       };
     } catch (error) {
-      console.error(`Failed to generate response for expert ${session.expertId}:`, error);
+      console.error(`Failed to generate response for expert ${targetExpertId}:`, error);
 
       const fallbackMessage = createFallbackMessage(
         sessionId,

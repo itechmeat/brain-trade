@@ -10,6 +10,7 @@ export interface InvestmentExpert {
   token?: string;
   tokenPrice?: number;
   costPerQuery?: number;
+  tokensPerQuery?: number; // Number of tokens per query
   description?: string;
   methodology: string;
   expertise: string;
