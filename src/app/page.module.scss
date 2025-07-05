@@ -132,45 +132,6 @@
   }
 }
 
-.footer {
-  display: flex;
-  justify-content: center;
-  padding: var(--spacing-lg);
-  background: #ffffff;
-  border-top: 1px solid #e2e8f0;
-
-  .tokenizedLink {
-    display: inline-flex;
-    align-items: center;
-    padding: 12px 24px;
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    color: white;
-    text-decoration: none;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 16px;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-      text-decoration: none;
-      color: white;
-    }
-
-    &:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-    }
-
-    @media (max-width: 768px) {
-      padding: 10px 20px;
-      font-size: 15px;
-    }
-  }
-}
-
 .expertGrid {
   width: 100%;
   max-width: 1200px;

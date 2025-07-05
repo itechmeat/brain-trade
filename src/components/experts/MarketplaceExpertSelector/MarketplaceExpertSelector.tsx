@@ -20,6 +20,7 @@ import {
 } from '@/components/ui';
 import { TokenPurchase } from '@/components/blockchain/TokenPurchase';
 import { SimpleExpertAvatar } from '../SimpleExpertAvatar';
+import { AddExpertCard } from '../AddExpertCard/AddExpertCard';
 import { createMarketplaceExpert } from '@/lib/marketplace-adapter';
 import { useContracts } from '@/hooks/useContracts';
 import { useTokenBalances } from '@/hooks/useTokenBalances';
@@ -194,6 +195,11 @@ export function MarketplaceExpertSelector({
       )}
 
       <div className={styles.expertList}>
+        {/* Add Expert Card */}
+        <div className={styles.expertCardWrapper}>
+          <AddExpertCard />
+        </div>
+
         {marketplaceExperts.map(expert => {
           const balance = getBalance(expert.token || expert.slug);
           const balanceLoaded = isLoaded(expert.token || expert.slug);

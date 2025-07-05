@@ -33,16 +33,40 @@
   gap: 16px;
 }
 
+.expertHead {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.expertHeadContent {
+  position: relative;
+}
+
 .expertInfo {
   flex: 1;
   min-width: 0;
 
+  .expertNameRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 16px;
+
+    .publicChatSwitch {
+      flex-shrink: 0;
+    }
+  }
+
   h4 {
-    margin: 0 0 8px 0;
+    margin: 0;
     font-size: 22px;
     font-weight: 600;
     color: #1f2937;
     line-height: 1.2;
+    flex: 1;
+    min-width: 0;
   }
 
   .fund {
@@ -82,20 +106,20 @@
   align-items: center;
   justify-content: flex-end;
   flex-shrink: 0;
-  
+
   .userBalance {
     background: #f8fafc;
     padding: 8px 12px;
     border-radius: 8px;
     border: 1px solid #e2e8f0;
     white-space: nowrap;
-    
+
     // Make balance more prominent
     :global(.tokenBalance) {
       font-weight: 600;
       font-size: 16px;
       color: #1f2937;
-      
+
       .amount {
         font-weight: 600;
       }
@@ -118,7 +142,6 @@
   color: #6b7280;
   font-weight: 500;
 }
-
 
 .balanceRow {
   display: flex;
@@ -156,7 +179,7 @@
 
   .tipButtonWrapper {
     flex: 1;
-    
+
     :global(.tipButton) {
       width: 100% !important;
       min-height: 44px !important;
@@ -219,14 +242,14 @@
   word-wrap: break-word;
 
   &.user {
-    background: #87CEEB;
+    background: #87ceeb;
     color: #333;
     margin-left: auto;
     border-bottom-right-radius: 6px;
   }
 
   &.expert {
-    background: #F2F2F7;
+    background: #f2f2f7;
     color: #000;
     margin-right: auto;
     border-bottom-left-radius: 6px;
@@ -244,11 +267,11 @@
 
 .messageAuthor {
   font-weight: 600;
-  
+
   .user & {
     color: rgba(51, 51, 51, 0.7);
   }
-  
+
   .expert & {
     color: #666;
   }
@@ -257,11 +280,11 @@
 .messageTime {
   font-size: 10px;
   font-weight: 400;
-  
+
   .user & {
     color: rgba(51, 51, 51, 0.6);
   }
-  
+
   .expert & {
     color: #999;
   }
@@ -270,11 +293,11 @@
 .messageContent {
   line-height: 1.4;
   font-size: 15px;
-  
+
   .user & {
     color: #333;
   }
-  
+
   .expert & {
     color: #000;
   }
@@ -285,11 +308,11 @@
   margin-top: 8px;
   font-family: monospace;
   opacity: 0.6;
-  
+
   .user & {
     color: rgba(51, 51, 51, 0.7);
   }
-  
+
   .expert & {
     color: #666;
   }
@@ -411,14 +434,14 @@
 
 .chatHeader {
   margin-bottom: 16px;
-  
+
   h3 {
     margin: 0 0 4px 0;
     font-size: 20px;
     font-weight: 600;
     color: #1f2937;
   }
-  
+
   p {
     margin: 0;
     font-size: 14px;
@@ -482,8 +505,14 @@
     gap: 12px;
   }
 
-  .expertInfo h4 {
-    font-size: 20px;
+  .expertInfo {
+    .expertNameRow {
+      gap: 8px;
+    }
+
+    h4 {
+      font-size: 20px;
+    }
   }
 
   .balanceRow {
@@ -495,13 +524,13 @@
   .tokenActions {
     flex-direction: row;
     gap: 8px;
-    
+
     .actionButton {
       min-height: 40px;
       padding: 10px 16px;
       font-size: 13px;
     }
-    
+
     .tipButtonWrapper {
       :global(.tipButton) {
         min-height: 40px !important;
@@ -516,18 +545,18 @@
     justify-content: space-between;
     align-items: center;
     gap: 8px;
-    
+
     .pricingLeft {
       flex: 1;
       min-width: 0;
     }
-    
+
     .pricingRight {
       flex-shrink: 0;
-      
+
       .userBalance {
         padding: 6px 10px;
-        
+
         :global(.tokenBalance) {
           font-size: 14px;
         }
@@ -544,7 +573,6 @@
     gap: 8px;
     text-align: center;
   }
-
 }
 
 @media (max-width: 480px) {
@@ -560,6 +588,12 @@
   }
 
   .expertInfo {
+    .expertNameRow {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
     h4 {
       font-size: 18px;
     }
@@ -575,35 +609,35 @@
     justify-content: space-between;
     align-items: center;
     gap: 8px;
-    
+
     .pricingLeft {
       flex: 1;
       min-width: 0;
     }
-    
+
     .pricingRight {
       flex-shrink: 0;
-      
+
       .userBalance {
         padding: 6px 10px;
-        
+
         :global(.tokenBalance) {
           font-size: 14px;
         }
       }
     }
   }
-  
+
   .tokenActions {
     flex-direction: row;
     gap: 8px;
-    
+
     .actionButton {
       min-height: 40px;
       padding: 8px 12px;
       font-size: 12px;
     }
-    
+
     .tipButtonWrapper {
       :global(.tipButton) {
         min-height: 40px !important;

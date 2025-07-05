@@ -4,3 +4,4 @@ export { useContracts } from './useContracts';
 export { useTokenizedChat } from './useTokenizedChat';
 export { useTokenBalances } from './useTokenBalances';
 export { useTokenCache } from './useTokenCache';
+export { useToast } from './useToast';
