@@ -1,25 +1,29 @@
 'use client';
 
-import React from 'react';
-import { useRouter } from 'next/navigation';
-import { ExpertSelectionGrid } from '@/components/experts';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { MarketplaceExpertSelector } from '@/components/experts';
 import { AuthButton } from '@/components/auth';
-import { Button } from '@/components/ui';
 import investmentExperts from '@/data/investment_experts.json';
 import type { InvestmentExpert } from '@/types/expert';
 import styles from './page.module.scss';
 
 export default function Home() {
-  const router = useRouter();
-  const experts = investmentExperts as InvestmentExpert[];
+  const [experts, setExperts] = useState<InvestmentExpert[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleExpertSelect = (expertSlug: string) => {
-    // Create a new chat session ID
-    const chatId = `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  // Simulate loading experts from blockchain
+  useEffect(() => {
+    const loadExperts = async () => {
+      setLoading(true);
+      // Simulate blockchain loading delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setExperts(investmentExperts as InvestmentExpert[]);
+      setLoading(false);
+    };
 
-    // Navigate to expert chat
-    router.push(`/chat/${expertSlug}/${chatId}`);
-  };
+    loadExperts();
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -32,34 +36,18 @@ export default function Home() {
             </div>
             <AuthButton />
           </div>
-          <p className={styles.description}>
-            Select an expert and start a personal consultation on any topic
-          </p>
-
-          <div className={styles.actionButtons}>
-            <Button variant="primary" size="lg" onClick={() => router.push('/tokenized-chat')}>
-              🪙 Tokenized consultations
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => {
-                /* Scroll to experts */
-              }}
-            >
-              📝 Regular chat
-            </Button>
-          </div>
         </div>
       </header>
 
       <main className={styles.main}>
-        <ExpertSelectionGrid
-          experts={experts}
-          onExpertSelect={handleExpertSelect}
-          className={styles.expertGrid}
-        />
+        <MarketplaceExpertSelector experts={experts} loading={loading} />
       </main>
+
+      <footer className={styles.footer}>
+        <Link href="/tokenized-chat" className={styles.tokenizedLink}>
+          🪙 Tokenized consultations
+        </Link>
+      </footer>
     </div>
   );
 }

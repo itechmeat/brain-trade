@@ -1,0 +1,396 @@
+/**
+ * Styles for marketplace tokenized chat
+ */
+
+.marketplaceTokenizedChat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 16px;
+}
+
+.tokenInfo {
+  flex-shrink: 0;
+}
+
+.tokenCard {
+  padding: 20px;
+  background: var(--surface-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border-primary);
+}
+
+.expertHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.expertInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  h4 {
+    margin: 0 0 4px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .category {
+    margin: 0 0 2px 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .fund {
+    margin: 0;
+    font-size: 13px;
+    color: var(--primary);
+    font-weight: 500;
+  }
+}
+
+.tokenBalance {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.balanceRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  span:first-child {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+}
+
+.tokenActions {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+
+  .insufficientWarning {
+    color: var(--error);
+    font-size: 13px;
+    font-weight: 500;
+    flex-basis: 100%;
+    margin-top: 4px;
+  }
+}
+
+.chatContainer {
+  flex: 1;
+  min-height: 0;
+}
+
+.messagesContainer {
+  margin-bottom: 20px;
+}
+
+.messagesCard {
+  padding: 20px;
+  background: var(--surface-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border-primary);
+
+  h4 {
+    margin: 0 0 16px 0;
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 600;
+  }
+}
+
+.messagesList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.message {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+
+  &.user {
+    background: var(--primary-bg);
+    border-color: var(--primary-light);
+    margin-left: 20px;
+  }
+
+  &.expert {
+    background: var(--surface-primary);
+    border-color: var(--border-primary);
+    margin-right: 20px;
+  }
+}
+
+.messageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.messageAuthor {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.messageTime {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.messageContent {
+  color: var(--text-primary);
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.messageMetadata {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-top: 5px;
+  font-family: monospace;
+}
+
+.consultationStatus {
+  flex-shrink: 0;
+  padding: 16px;
+  background: var(--primary-bg);
+  border-radius: 8px;
+  border: 1px solid var(--primary);
+}
+
+.processingIndicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  span {
+    color: var(--primary);
+    font-weight: 500;
+  }
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--primary-light);
+  border-top: 2px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.consultationInfo {
+  flex-shrink: 0;
+  margin-top: 16px;
+}
+
+.infoCard {
+  padding: 16px;
+  background: var(--info-bg);
+  border-radius: 8px;
+  border: 1px solid var(--info);
+
+  h4 {
+    margin: 0 0 8px 0;
+    color: var(--info);
+    font-size: 16px;
+  }
+
+  p {
+    margin: 4px 0;
+    color: var(--info);
+    font-size: 13px;
+  }
+}
+
+.errorContainer {
+  flex-shrink: 0;
+}
+
+.errorCard {
+  padding: 16px;
+  background: var(--error-bg);
+  border-radius: 8px;
+  border: 1px solid var(--error);
+
+  h4 {
+    margin: 0 0 8px 0;
+    color: var(--error);
+    font-size: 16px;
+  }
+
+  p {
+    margin: 0;
+    color: var(--error);
+    font-size: 14px;
+  }
+}
+
+// States for different situations
+.connectWallet,
+.networkMismatch,
+.selectExpert {
+  padding: 40px 20px;
+  text-align: center;
+  background: var(--surface-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border-primary);
+
+  h3 {
+    margin: 0 0 12px 0;
+    color: var(--text-primary);
+    font-size: 20px;
+  }
+
+  p {
+    margin: 0 0 20px 0;
+    color: var(--text-secondary);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+}
+
+.walletActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.debugButton {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #ff5252;
+  }
+}
+
+.debugInfo {
+  padding: 10px;
+  background: #f0f0f0;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-family: monospace;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+
+  div {
+    margin-bottom: 2px;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// Mobile responsiveness
+@media (max-width: 768px) {
+  .marketplaceTokenizedChat {
+    gap: 12px;
+  }
+
+  .tokenCard {
+    padding: 16px;
+  }
+
+  .expertInfo h4 {
+    font-size: 16px;
+  }
+
+  .balanceRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .tokenActions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .consultationStatus {
+    padding: 12px;
+  }
+
+  .processingIndicator {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .walletActions {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .expertHeader {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .expertInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+
+    h4 {
+      font-size: 16px;
+    }
+
+    .category,
+    .fund {
+      font-size: 12px;
+    }
+  }
+
+  .messagesList {
+    max-height: 250px;
+  }
+
+  .message {
+    padding: 10px;
+
+    &.user {
+      margin-left: 10px;
+    }
+
+    &.expert {
+      margin-right: 10px;
+    }
+  }
+
+  .debugInfo {
+    font-size: 10px;
+    padding: 8px;
+  }
+}

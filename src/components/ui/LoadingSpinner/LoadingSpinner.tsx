@@ -8,30 +8,31 @@ import React from 'react';
 import styles from './LoadingSpinner.module.scss';
 
 interface LoadingSpinnerProps {
-  /** Size of the spinner */
-  size?: 'small' | 'medium' | 'large';
-  /** Loading text to display */
-  text?: string;
-  /** Whether to center the spinner */
-  centered?: boolean;
+  /** Main title text */
+  title?: string;
+  /** Subtitle/description text */
+  subtitle?: string;
   /** Additional CSS classes */
   className?: string;
 }
 
 export function LoadingSpinner({
-  size = 'medium',
-  text,
-  centered = false,
+  title = 'Loading',
+  subtitle = 'Please wait...',
   className = '',
 }: LoadingSpinnerProps) {
-  const containerClasses = [styles.container, centered && styles.centered, className]
-    .filter(Boolean)
-    .join(' ');
-
   return (
-    <div className={containerClasses}>
-      <div className={`${styles.spinner} ${styles[size]}`} />
-      {text && <span className={styles.text}>{text}</span>}
+    <div className={`${styles.loadingSpinner} ${className}`}>
+      <div className={styles.content}>
+        <div className={styles.spinner}>
+          <div className={styles.spinnerRing}></div>
+        </div>
+
+        <div className={styles.textContent}>
+          <h3 className={styles.title}>{title}</h3>
+          <p className={styles.subtitle}>{subtitle}</p>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { CookieIcon } from '@radix-ui/react-icons';
 import { TokenBalance as TokenBalanceType } from '@/types/contracts';
 import { formatTokenAmount } from '@/lib/blockchain/config';
 import styles from './TokenBalance.module.scss';
@@ -18,6 +19,10 @@ interface TokenBalanceProps {
   loadingText?: string;
   /** Additional CSS classes */
   className?: string;
+  /** Whether to show coin icon */
+  showIcon?: boolean;
+  /** Icon size */
+  iconSize?: number;
 }
 
 export function TokenBalance({
@@ -28,6 +33,8 @@ export function TokenBalance({
   showAffordability = false,
   loadingText = 'Loading...',
   className = '',
+  showIcon = false,
+  iconSize = 20,
 }: TokenBalanceProps) {
   const displaySymbol = symbol || balance?.symbol || 'TOKEN';
 
@@ -46,7 +53,9 @@ export function TokenBalance({
   const canAfford = balance?.canAffordConsultation;
 
   return (
-    <div className={`${styles.tokenBalance} ${styles[size]} ${className}`}>
+    <div
+      className={`${styles.tokenBalance} ${styles[size]} ${className} ${showIcon ? styles.withIcon : ''}`}
+    >
       <span
         className={`${styles.amount} ${
           showAffordability && canAfford !== undefined
@@ -58,6 +67,7 @@ export function TokenBalance({
       >
         {balanceAmount} {displaySymbol}
       </span>
+      {showIcon && <CookieIcon width={iconSize} height={iconSize} className={styles.coinIcon} />}
     </div>
   );
 }
