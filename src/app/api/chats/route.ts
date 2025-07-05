@@ -21,7 +21,13 @@ export const GET = createAPIHandler(async () => {
  */
 export const POST = createAPIHandler(async (request: NextRequest) => {
   const body = await request.json();
-  const validatedData = ValidationSchemas.chat.create.parse(body);
+  
+  // Check if this is a tokenized chat request
+  const isTokenizedChat = body.isTokenized === true;
+  const validatedData = isTokenizedChat 
+    ? ValidationSchemas.chat.tokenized.parse(body)
+    : ValidationSchemas.chat.create.parse(body);
+    
   const { originalIdea, expertId, language, id } = validatedData;
 
   const newSession = createChatSession(originalIdea, expertId, language, id);

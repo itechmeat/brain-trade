@@ -20,7 +20,7 @@ export function useChat() {
   /**
    * Starts a new chat session with a specific expert
    */
-  const startNewChat = useCallback(async (idea: string, expertId: string): Promise<ChatSession> => {
+  const startNewChat = useCallback(async (idea: string, expertId: string, isTokenized?: boolean): Promise<ChatSession> => {
     setIsLoading(true);
     setError(null);
 
@@ -35,6 +35,7 @@ export function useChat() {
         body: JSON.stringify({
           originalIdea: idea,
           expertId: expertId,
+          isTokenized: isTokenized || false,
         }),
       });
 
@@ -64,9 +65,10 @@ export function useChat() {
 
   /**
    * Sends a message and gets expert response
+   * Enhanced version with support for expert symbol parameter
    */
   const sendMessage = useCallback(
-    async (content: string): Promise<void> => {
+    async (content: string, expertSymbol?: string): Promise<void> => {
       if (!currentSession) {
         throw new Error('No active chat session');
       }
@@ -85,6 +87,7 @@ export function useChat() {
           body: JSON.stringify({
             content,
             type: 'user',
+            expertSymbol: expertSymbol || currentSession.expertId,
           }),
         });
 

@@ -17,6 +17,7 @@ const hardhatConfig = {
       chainId: 1337,
     },
     zircuit: {
+      type: 'http',
       url: process.env.ZIRCUIT_RPC_URL || 'https://zircuit-garfield-testnet.drpc.org',
       chainId: 0xbf02, // 49026 in decimal
       accounts: process.env.ZIRCUIT_PRIVATE_KEY ? [process.env.ZIRCUIT_PRIVATE_KEY] : [],

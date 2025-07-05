@@ -4,6 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { ExpertSelectionGrid } from '@/components/experts';
 import { AuthButton } from '@/components/auth';
+import { Button } from '@/components/ui';
 import investmentExperts from '@/data/investment_experts.json';
 import type { InvestmentExpert } from '@/types/expert';
 import styles from './page.module.scss';
@@ -34,6 +35,21 @@ export default function Home() {
           <p className={styles.description}>
             Select an expert and start a personal consultation on any topic
           </p>
+
+          <div className={styles.actionButtons}>
+            <Button variant="primary" size="lg" onClick={() => router.push('/tokenized-chat')}>
+              🪙 Tokenized consultations
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => {
+                /* Scroll to experts */
+              }}
+            >
+              📝 Regular chat
+            </Button>
+          </div>
         </div>
       </header>
 

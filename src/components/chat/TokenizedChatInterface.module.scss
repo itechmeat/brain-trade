@@ -1,0 +1,279 @@
+/**
+ * Styles for tokenized chat
+ */
+
+.tokenizedChat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 16px;
+}
+
+.tokenInfo {
+  flex-shrink: 0;
+}
+
+.tokenCard {
+  padding: 20px;
+  background: var(--surface-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border-primary);
+}
+
+.expertInfo {
+  margin-bottom: 16px;
+
+  h4 {
+    margin: 0 0 4px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .category {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+}
+
+.tokenBalance {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.balanceRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  span:first-child {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .balance {
+    font-weight: 600;
+    color: var(--success);
+    font-size: 16px;
+  }
+
+  .cost {
+    font-weight: 600;
+    color: var(--warning);
+    font-size: 16px;
+  }
+}
+
+.chatContainer {
+  flex: 1;
+  min-height: 0;
+}
+
+.consultationStatus {
+  flex-shrink: 0;
+  padding: 16px;
+  background: var(--primary-bg);
+  border-radius: 8px;
+  border: 1px solid var(--primary);
+}
+
+.processingIndicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  span {
+    color: var(--primary);
+    font-weight: 500;
+  }
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--primary-light);
+  border-top: 2px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.consultationInfo {
+  flex-shrink: 0;
+  margin-top: 16px;
+}
+
+.infoCard {
+  padding: 16px;
+  background: var(--info-bg);
+  border-radius: 8px;
+  border: 1px solid var(--info);
+
+  h4 {
+    margin: 0 0 8px 0;
+    color: var(--info);
+    font-size: 16px;
+  }
+
+  p {
+    margin: 4px 0;
+    color: var(--info);
+    font-size: 13px;
+  }
+}
+
+.errorContainer {
+  flex-shrink: 0;
+}
+
+.errorCard {
+  padding: 16px;
+  background: var(--error-bg);
+  border-radius: 8px;
+  border: 1px solid var(--error);
+
+  h4 {
+    margin: 0 0 8px 0;
+    color: var(--error);
+    font-size: 16px;
+  }
+
+  p {
+    margin: 0;
+    color: var(--error);
+    font-size: 14px;
+  }
+}
+
+// States for different situations
+.connectWallet,
+.networkMismatch,
+.selectExpert {
+  padding: 40px 20px;
+  text-align: center;
+  background: var(--surface-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border-primary);
+
+  h3 {
+    margin: 0 0 12px 0;
+    color: var(--text-primary);
+    font-size: 20px;
+  }
+
+  p {
+    margin: 0 0 20px 0;
+    color: var(--text-secondary);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+}
+
+// Mobile responsiveness
+@media (max-width: 768px) {
+  .tokenizedChat {
+    gap: 12px;
+  }
+
+  .tokenCard {
+    padding: 16px;
+  }
+
+  .expertInfo h4 {
+    font-size: 16px;
+  }
+
+  .balanceRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .consultationStatus {
+    padding: 12px;
+  }
+
+  .processingIndicator {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+}
+
+.debugButton {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #ff5252;
+  }
+}
+
+.expertHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.expertInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.balanceLoading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+
+  .miniSpinner {
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--border-light);
+    border-top: 2px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.tokenActions {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+
+  .insufficientWarning {
+    color: var(--error);
+    font-size: 13px;
+    font-weight: 500;
+  }
+}

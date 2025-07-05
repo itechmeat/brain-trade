@@ -1,0 +1,46 @@
+/**
+ * Styles for simple expert avatar
+ */
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.small {
+  width: 32px;
+  height: 32px;
+
+  .initials {
+    font-size: 12px;
+  }
+}
+
+.medium {
+  width: 48px;
+  height: 48px;
+
+  .initials {
+    font-size: 16px;
+  }
+}
+
+.large {
+  width: 64px;
+  height: 64px;
+
+  .initials {
+    font-size: 20px;
+  }
+}
+
+.initials {
+  user-select: none;
+}
