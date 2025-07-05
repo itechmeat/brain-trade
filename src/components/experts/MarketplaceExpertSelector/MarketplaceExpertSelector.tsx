@@ -318,7 +318,6 @@ export function MarketplaceExpertSelector({
         onOpenChange={setShowPurchaseModal}
         title={`Buy ${purchaseExpert?.token || purchaseExpert?.slug} tokens`}
         description={`Purchase tokens for consultation with ${purchaseExpert?.name}`}
-        size="md"
       >
         {purchaseExpert && (
           <TokenPurchase

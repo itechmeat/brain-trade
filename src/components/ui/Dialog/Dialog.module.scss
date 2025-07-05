@@ -1,69 +1,27 @@
 /**
- * Dialog component styles
+ * Dialog component styles - following Radix UI documentation
+ * Only styling the content, letting Radix handle overlay and positioning
  */
 
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(4px);
-  z-index: 1000;
-  
-  // Animation
-  animation: overlayShow 200ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes overlayShow {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 .content {
+  background: var(--background);
+  border-radius: 6px;
+  box-shadow:
+    hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+    hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: var(--background);
-  border-radius: var(--border-radius-lg);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-lg);
-  max-height: 90vh;
-  overflow-y: auto;
-  z-index: 1001;
-  
-  // Animation
-  animation: contentShow 200ms cubic-bezier(0.16, 1, 0.3, 1);
-  
-  // Size variants
-  &.sm {
-    width: 90vw;
-    max-width: 400px;
-  }
-  
-  &.md {
-    width: 90vw;
-    max-width: 500px;
-  }
-  
-  &.lg {
-    width: 90vw;
-    max-width: 700px;
-  }
-  
-  &.xl {
-    width: 90vw;
-    max-width: 900px;
-  }
-  
-  // Focus outline
-  &:focus {
-    outline: 2px solid var(--accent-color);
-    outline-offset: 2px;
-  }
+  width: 90vw;
+  max-width: 450px;
+  max-height: 85vh;
+  padding: 25px;
+  animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.content:focus {
+  outline: none;
 }
 
 @keyframes contentShow {
@@ -81,65 +39,45 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing-xl) var(--spacing-xl) 0 var(--spacing-xl);
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: 20px;
 }
 
 .title {
   margin: 0;
-  font-size: var(--font-size-lg);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-primary);
+  font-size: 17px;
 }
 
 .description {
-  margin: 0 0 var(--spacing-lg) 0;
-  padding: 0 var(--spacing-xl);
+  margin: 10px 0 20px;
   color: var(--text-secondary);
-  font-size: var(--font-size-base);
+  font-size: 15px;
   line-height: 1.5;
 }
 
-.body {
-  padding: 0 0 var(--spacing-xl) 0;
-}
-
 .closeButton {
-  font-size: var(--font-size-base);
-  flex-shrink: 0;
+  font-family: inherit;
+  border-radius: 100%;
+  height: 25px;
+  width: 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
 }
 
-// Mobile responsiveness
-@media (max-width: 768px) {
-  .content {
-    margin: var(--spacing-xl);
-    width: calc(100vw - calc(var(--spacing-xl) * 2));
-    max-height: calc(100vh - calc(var(--spacing-xl) * 2));
-    
-    &.sm,
-    &.md,
-    &.lg,
-    &.xl {
-      width: calc(100vw - calc(var(--spacing-xl) * 2));
-      max-width: none;
-    }
-  }
-  
-  .header {
-    padding: var(--spacing-md) var(--spacing-lg) 0 var(--spacing-lg);
-    margin-bottom: var(--spacing-md);
-  }
-  
-  .title {
-    font-size: var(--font-size-base);
-  }
-  
-  .description {
-    padding: 0 var(--spacing-lg);
-    margin-bottom: var(--spacing-md);
-  }
-  
-  .body {
-    padding: 0 0 var(--spacing-lg) 0;
-  }
+.closeButton:hover {
+  background: var(--background-secondary);
+}
+
+.closeButton:focus {
+  box-shadow: 0 0 0 2px var(--accent-color);
 }

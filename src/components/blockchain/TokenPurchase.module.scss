@@ -2,44 +2,15 @@
  * Styles for token purchase component
  */
 
-.tokenPurchase {
-  padding: var(--spacing-xl);
-  background: var(--background-secondary);
-  border-radius: var(--border-radius-md);
-  border: 1px solid var(--border-color);
-}
-
-.header {
-  margin-bottom: var(--spacing-xl);
-  text-align: center;
-
-  h3 {
-    margin: 0 0 var(--spacing-sm) 0;
-    color: var(--text-primary);
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-  }
-
-  .expertName {
-    margin: 0 0 var(--spacing-md) 0;
-    color: var(--text-secondary);
-    font-size: var(--font-size-base);
-  }
-
-  .costInfo {
-    margin: 0;
-    color: var(--warning-color);
-    font-size: var(--font-size-base);
-    font-weight: 500;
-    padding: var(--spacing-sm) var(--spacing-md);
-    background: var(--warning-light);
-    border-radius: var(--border-radius-sm);
-    border: 1px solid var(--warning-color);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    justify-content: center;
-  }
+.costInfo {
+  margin: 0 0 var(--spacing-lg) 0;
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
 }
 
 .suggestions {
@@ -65,16 +36,28 @@
   background: var(--accent-light);
   border-radius: var(--border-radius-md);
   border: 1px solid var(--accent-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
 
-  p {
-    margin: 0 0 var(--spacing-sm) 0;
-    color: var(--accent-color);
-    font-size: var(--font-size-base);
+  .textInfo {
+    flex: 1;
+    
+    p {
+      margin: 0 0 var(--spacing-xs) 0;
+      color: var(--accent-color);
+      font-size: var(--font-size-base);
 
-    &:last-of-type {
-      margin-bottom: var(--spacing-md);
-      font-weight: 500;
+      &:last-of-type {
+        margin-bottom: 0;
+        font-weight: 500;
+      }
     }
+  }
+
+  .buyButton {
+    flex-shrink: 0;
   }
 }
 
@@ -195,10 +178,6 @@
 
 // Responsiveness
 @media (max-width: 768px) {
-  .tokenPurchase {
-    padding: var(--spacing-lg);
-  }
-
   .suggestionButtons {
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-xs);
@@ -214,10 +193,6 @@
 }
 
 @media (max-width: 480px) {
-  .tokenPurchase {
-    padding: var(--spacing-lg);
-  }
-
   .header h3 {
     font-size: var(--font-size-lg);
   }
